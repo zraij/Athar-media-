@@ -1,6 +1,6 @@
 """Athar autopilot decision engine (no network; the run passes Windsor data in as a JSON file).
 
-python3 autopilot/decide.py plan   --posts posts.json [--now 2026-11-16T17:05:00Z]
+python3 autopilot/decide.py [--channel fb|ig] plan   --posts posts.json [--now 2026-11-16T17:05:00Z]
 python3 autopilot/decide.py record --id 003 --post-id <fb post id> --slot 20:00 [--now ...]
 python3 autopilot/decide.py report --posts posts.json [--days 7]
 
@@ -14,9 +14,14 @@ from datetime import datetime, timedelta, timezone
 ROOT = pathlib.Path(__file__).resolve().parent
 CFG = json.loads((ROOT / 'config.json').read_text(encoding='utf-8'))
 TZ = timezone(timedelta(hours=CFG['utc_offset_hours']))
-LOG = ROOT / 'log.csv'
-QUEUE = ROOT / 'queue'
-DONE = ROOT / 'published'
+CH = {}
+LOG = QUEUE = DONE = None
+
+
+def use_channel(name):
+    global CH, LOG, QUEUE, DONE
+    CH = CFG['channels'][name]; LOG = ROOT / CH['log']; QUEUE = ROOT / CH['queue']; DONE = ROOT / CH['done']
+
 LOG_FIELDS = ['queue_id', 'theme', 'post_id', 'published_at_utc', 'slot']
 
 
@@ -43,15 +48,26 @@ def load_posts(path):
     raw = json.loads(pathlib.Path(path).read_text(encoding='utf-8'))
     rows = raw.get('data', raw) if isinstance(raw, dict) else raw
     out = []
+    def pick(r, keys):
+        for k in keys:
+            if r.get(k) not in (None, ''): return r[k]
+        return None
     for r in rows:
-        if not r.get('post_id') or not r.get('post_created_time'): continue
-        g = lambda k: float(r.get(k) or 0)
-        score = g('post_impressions') + 3 * g('post_clicks') + 5 * (g('post_reactions_total') + g('post_comments_total')) + 2 * g('post_video_views')
-        out.append({'post_id': r['post_id'], 'created': parse_time(r['post_created_time']), 'score': score,
-                    'impressions': g('post_impressions'), 'clicks': g('post_clicks'),
-                    'reactions': g('post_reactions_total'), 'comments': g('post_comments_total'),
-                    'text': (r.get('post_message_oneline') or '')[:60]})
-    return out
+        pid = pick(r, ['post_id', 'media_id', 'id']); ct = pick(r, ['post_created_time', 'timestamp', 'media_timestamp', 'created_time', 'media_created_time'])
+        if not pid or not ct: continue
+        g = lambda keys: float(pick(r, keys) or 0)
+        imp = g(['post_impressions', 'media_reach', 'reach', 'media_impressions', 'impressions', 'media_views', 'views'])
+        clk = g(['post_clicks']); rea = g(['post_reactions_total', 'media_like_count', 'like_count', 'likes'])
+        com = g(['post_comments_total', 'media_comments_count', 'comments_count', 'comments'])
+        vv = g(['post_video_views', 'media_plays', 'plays', 'video_views', 'media_video_views'])
+        score = imp + 3 * clk + 5 * (rea + com) + 2 * vv
+        out.append({'post_id': str(pid), 'created': parse_time(str(ct)), 'score': score, 'impressions': imp, 'clicks': clk,
+                    'reactions': rea, 'comments': com, 'text': str(pick(r, ['post_message_oneline', 'media_caption', 'caption']) or '')[:60]})
+    # one row per post (Windsor may return a post once per date)
+    best = {}
+    for p in out:
+        if p['post_id'] not in best or p['score'] > best[p['post_id']]['score']: best[p['post_id']] = p
+    return list(best.values())
 
 
 def load_log():
@@ -95,7 +111,7 @@ def plan(args):
         ranked = [best] + rest
     else:
         ranked = sorted(CFG['slots'], key=lambda s: (-su[s][0], -su[s][1], tiebreak(s, today)))
-    today_slots = sorted(ranked[:CFG['posts_per_day']], key=slot_minutes)
+    today_slots = sorted(ranked[:CH['posts_per_day']], key=slot_minutes)
     # --- themes (only autopilot posts carry a theme)
     pid2score = {p['post_id']: p for p in scored}
     by_theme = {}
@@ -104,8 +120,8 @@ def plan(args):
         if p: by_theme.setdefault(r['theme'], []).append(math.log1p(p['score']))
     items = []
     for d in sorted(QUEUE.iterdir()) if QUEUE.exists() else []:
-        if (d / 'post.json').exists() and (d / 'post.jpg').exists():
-            meta = json.loads((d / 'post.json').read_text(encoding='utf-8')); items.append((d.name, meta['theme']))
+        if (d / CH['meta']).exists() and (d / CH['media']).exists():
+            meta = json.loads((d / CH['meta']).read_text(encoding='utf-8')); items.append((d.name, meta['theme']))
     themes = sorted({t for _, t in items})
     tu = ucb(by_theme, themes, now, CFG['exploration_c'])
     last_theme = log[-1]['theme'] if log else None
@@ -114,8 +130,9 @@ def plan(args):
     nxt = None
     if theme_rank:
         t = theme_rank[0]; nid = min(i for i, th in items if th == t); nxt = {'id': nid, 'theme': t}
-        nxt['image_url'] = f"{CFG['image_url_base']}/{nid}/post.jpg"
-        nxt['caption'] = json.loads((QUEUE / nid / 'post.json').read_text(encoding='utf-8'))['caption']
+        nxt['media_url'] = f"{CH['url_base']}/{nid}/{CH['media']}"
+        if CH['media'].endswith('.mp4'): nxt['cover_url'] = f"{CH['url_base']}/{nid}/cover.jpg"
+        nxt['caption'] = json.loads((QUEUE / nid / CH['meta']).read_text(encoding='utf-8'))['caption']
     # --- should we publish now?
     cur, dist = nearest_slot(local)
     in_window = dist <= CFG['slot_window_minutes']
@@ -125,7 +142,7 @@ def plan(args):
     if not in_window: reasons.append(f'not near any slot (nearest {cur}, {dist} min away)')
     if cur not in today_slots: reasons.append(f'{cur} is not one of today\'s slots {today_slots}')
     if any(r['slot'] == cur for r in ours_today): reasons.append(f'already published at {cur} today')
-    if len(ours_today) >= CFG['posts_per_day']: reasons.append('daily quota reached')
+    if len(ours_today) >= CH['posts_per_day']: reasons.append('daily quota reached')
     if recent_any: reasons.append('another post went out on the page less than 2h ago')
     if not nxt: reasons.append('queue is empty')
     out = {
@@ -142,7 +159,7 @@ def plan(args):
 def record(args):
     now = parse_time(args.now) if args.now else datetime.now(timezone.utc)
     src = QUEUE / args.id
-    meta = json.loads((src / 'post.json').read_text(encoding='utf-8'))
+    meta = json.loads((src / CH['meta']).read_text(encoding='utf-8'))
     new = not LOG.exists()
     with LOG.open('a', encoding='utf-8', newline='') as f:
         w = csv.DictWriter(f, LOG_FIELDS)
@@ -150,7 +167,7 @@ def record(args):
         w.writerow({'queue_id': args.id, 'theme': meta['theme'], 'post_id': args.post_id,
                     'published_at_utc': now.strftime('%Y-%m-%dT%H:%M:%SZ'), 'slot': args.slot})
     DONE.mkdir(exist_ok=True); shutil.move(str(src), str(DONE / args.id))
-    print(f'recorded {args.id} ({meta["theme"]}) as {args.post_id}; moved to published/{args.id}')
+    print(f'recorded {args.id} ({meta["theme"]}) as {args.post_id}; moved to {CH["done"]}/{args.id}')
 
 
 def report(args):
@@ -166,8 +183,8 @@ def report(args):
     print('\n'.join(lines))
 
 
-ap = argparse.ArgumentParser(); sp = ap.add_subparsers(dest='cmd', required=True)
+ap = argparse.ArgumentParser(); ap.add_argument('--channel', choices=['fb', 'ig'], default='fb'); sp = ap.add_subparsers(dest='cmd', required=True)
 a = sp.add_parser('plan'); a.add_argument('--posts'); a.add_argument('--now')
 b = sp.add_parser('record'); b.add_argument('--id', required=True); b.add_argument('--post-id', required=True); b.add_argument('--slot', required=True); b.add_argument('--now')
 c = sp.add_parser('report'); c.add_argument('--posts'); c.add_argument('--days', type=int, default=7)
-args = ap.parse_args(); {'plan': plan, 'record': record, 'report': report}[args.cmd](args)
+args = ap.parse_args(); use_channel(args.channel); {'plan': plan, 'record': record, 'report': report}[args.cmd](args)

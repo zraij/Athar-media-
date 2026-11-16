@@ -27,8 +27,8 @@ Runs as two scheduled tasks. Everything a run needs is in this folder.
 3. `python3 autopilot/decide.py plan --posts /tmp/posts.json` (from the repo root).
 4. If `publish_now` is false: stop. Publish nothing and keep the result to one line. Exception: in the 22:07 run, if `queue_low` is true, say in Arabic that the queue is running low.
 5. If `publish_now` is true:
-   - `curl -sI <next_item.image_url>` must return 200. If not, stop and report.
-   - Windsor `execute_action`: connector `facebook_organic`, action `create_photo_post`, account `1379414478591224`, params `{"image_url": next_item.image_url, "caption": next_item.caption}`. Use the caption exactly; do not edit it.
+   - `curl -sI <next_item.media_url>` must return 200. If not, stop and report.
+   - Windsor `execute_action`: connector `facebook_organic`, action `create_photo_post`, account `1379414478591224`, params `{"image_url": next_item.media_url, "caption": next_item.caption}`. Use the caption exactly; do not edit it.
    - `python3 autopilot/decide.py record --id <next_item.id> --post-id <returned Post id> --slot <current_slot>`
    - `git add -A && git commit -m "autopilot: publish <id>" && git -c push.negotiate=true push origin main` (author name "Athar Autopilot", email noreply@athar.local).
    - Result in Arabic, 2 lines: what went out (title + theme), at which slot, and queue_left.
