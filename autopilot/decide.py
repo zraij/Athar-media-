@@ -60,7 +60,8 @@ def load_posts(path):
         clk = g(['post_clicks']); rea = g(['post_reactions_total', 'media_like_count', 'like_count', 'likes'])
         com = g(['post_comments_total', 'media_comments_count', 'comments_count', 'comments'])
         vv = g(['post_video_views', 'media_plays', 'plays', 'video_views', 'media_video_views'])
-        score = imp + 3 * clk + 5 * (rea + com) + 2 * vv
+        sav = g(['media_shares']) + g(['media_saved'])
+        score = imp + 3 * clk + 5 * (rea + com + sav) + 2 * vv
         out.append({'post_id': str(pid), 'created': parse_time(str(ct)), 'score': score, 'impressions': imp, 'clicks': clk,
                     'reactions': rea, 'comments': com, 'text': str(pick(r, ['post_message_oneline', 'media_caption', 'caption']) or '')[:60]})
     # one row per post (Windsor may return a post once per date)

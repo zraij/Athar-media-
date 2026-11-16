@@ -36,7 +36,9 @@ Runs as two scheduled tasks. Everything a run needs is in this folder.
 
 ## Run C — Instagram reels (same 5 slots, right after Run A in the same session)
 1. Windsor `get_connectors`: find the `instagram` account id. If there is none, skip Run C (one line: Instagram is not connected in Windsor).
-2. Windsor `get_fields` on `instagram`, then `get_data` (account id, `last_30dT`) with the media fields for: media id, timestamp, caption, reach (or views/impressions), like count, comments count, plays/video views. Save the response to `/tmp/ig.json`. `decide.py` understands both Facebook and Instagram field names.
+2. Windsor `get_data` on `instagram` (accounts `["<instagram id>"]`, date_preset `last_30dT`) with fields
+   `media_id, timestamp, media_caption, media_type, media_reach, media_views, media_like_count, media_comments_count, media_shares, media_saved`. Save the response to `/tmp/ig.json` (an empty `data` list is fine for a new account).
+   Weekly run only: also read `followers_count` and the audience fields `audience_gender_age_name, audience_gender_age_size, city, audience_city_size` for the report (they stay empty until the account has enough followers). `decide.py` understands both Facebook and Instagram field names.
 3. `python3 autopilot/decide.py --channel ig plan --posts /tmp/ig.json` (1 reel a day; slots learned from Instagram data only).
 4. If `publish_now`:
    - `curl -sI <media_url>` must be 200 with content-type `video/mp4` (served by GitHub Pages). If it is 404, GitHub Pages is off: stop and say in Arabic that Pages must be enabled (Settings → Pages → Branch main).
