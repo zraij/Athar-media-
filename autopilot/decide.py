@@ -180,6 +180,7 @@ def record(args):
         w.writerow({'queue_id': args.id, 'theme': meta['theme'], 'post_id': args.post_id,
                     'published_at_utc': now.strftime('%Y-%m-%dT%H:%M:%SZ'), 'slot': args.slot})
     DONE.mkdir(exist_ok=True); shutil.move(str(src), str(DONE / args.id))
+    for big in (DONE / args.id).glob('*.mp4'): big.unlink()  # keep the Pages site small; the video is on Instagram now
     print(f'recorded {args.id} ({meta["theme"]}) as {args.post_id}; moved to {CH["done"]}/{args.id}')
 
 
