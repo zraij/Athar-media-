@@ -41,7 +41,7 @@ Runs as two scheduled tasks. Everything a run needs is in this folder.
    Weekly run only: also read `followers_count` and the audience fields `audience_gender_age_name, audience_gender_age_size, city, audience_city_size` for the report (they stay empty until the account has enough followers). `decide.py` understands both Facebook and Instagram field names.
 3. `python3 autopilot/decide.py --channel ig plan --posts /tmp/ig.json` (1 reel a day; slots learned from Instagram data only).
 4. If `publish_now`:
-   - `curl -sI <media_url>` must be 200 with content-type `video/mp4` (served by GitHub Pages). If it is 404, GitHub Pages is off: stop and say in Arabic that Pages must be enabled (Settings → Pages → Branch main).
+   - The video is served by GitHub Pages. Do not curl zraij.github.io (the sandbox proxy blocks it). Instead check the API: `curl -s https://api.github.com/repos/zraij/Athar-media-` must show `"has_pages": true`, and the newest deployment in `https://api.github.com/repos/zraij/Athar-media-/deployments?per_page=1` must have a `success` status (its `statuses_url`). If Pages is off, stop and say in Arabic that Pages must be enabled (Settings → Pages → Branch main).
    - Windsor `execute_action`: connector `instagram`, action `create_video_post`, account <instagram id>, params `{"video_url": media_url, "caption": caption, "cover_url": cover_url, "share_to_feed": true}`.
    - `python3 autopilot/decide.py --channel ig record --id <id> --post-id <returned media id> --slot <current_slot>`, then commit and push (pull --rebase first if the push is rejected).
    - Result line in Arabic: which reel went out on Instagram.
