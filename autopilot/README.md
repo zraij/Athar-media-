@@ -34,12 +34,24 @@ Runs as two scheduled tasks. Everything a run needs is in this folder.
    - Result in Arabic, 2 lines: what went out (title + theme), at which slot, and queue_left.
 6. Publish at most one post per run. Never publish anything that is not in `queue/`. Never delete or edit page posts.
 
+## Run C — Instagram reels (same 5 slots, right after Run A in the same session)
+1. Windsor `get_connectors`: find the `instagram` account id. If there is none, skip Run C (one line: Instagram is not connected in Windsor).
+2. Windsor `get_fields` on `instagram`, then `get_data` (account id, `last_30dT`) with the media fields for: media id, timestamp, caption, reach (or views/impressions), like count, comments count, plays/video views. Save the response to `/tmp/ig.json`. `decide.py` understands both Facebook and Instagram field names.
+3. `python3 autopilot/decide.py --channel ig plan --posts /tmp/ig.json` (1 reel a day; slots learned from Instagram data only).
+4. If `publish_now`:
+   - `curl -sI <media_url>` must be 200 with content-type `video/mp4` (served by GitHub Pages). If it is 404, GitHub Pages is off: stop and say in Arabic that Pages must be enabled (Settings → Pages → Branch main).
+   - Windsor `execute_action`: connector `instagram`, action `create_video_post`, account <instagram id>, params `{"video_url": media_url, "caption": caption, "cover_url": cover_url, "share_to_feed": true}`.
+   - `python3 autopilot/decide.py --channel ig record --id <id> --post-id <returned media id> --slot <current_slot>`, then commit and push (pull --rebase first if the push is rejected).
+   - Result line in Arabic: which reel went out on Instagram.
+5. At most one reel per run. Only from `vqueue/`.
+
 ## Run B — weekly analysis + new content (Saturday 11:23 Baghdad)
 1. Steps 1–2 of Run A, plus Windsor `get_data` on `facebook_organic` with fields `date, page_follows, page_daily_follows, page_impressions` (last_30dT) for follower growth.
 2. `python3 autopilot/decide.py report --posts /tmp/posts.json --days 7` and `plan` (for slot_scores / theme_scores).
 3. Write the weekly report **in Arabic (Iraqi, simple)**, short: followers now and gained this week, best post, best time slots, best themes, what changes next week. Send it with SendUserMessage / as the run result.
-4. Refill the queue to 14 posts: new folders numbered after the highest id in `queue/` and `published/`. Lean towards the two best themes (about 60%), keep at least one `engagement` post (question for teachers, ends with `ask`) and one `teacher_tips` value post. Then `python3 autopilot/render_posts.py --sheet /tmp/sheet.png`, look at the sheet, and fix any text that wraps badly or overflows (shorten it), re-render, commit and push.
-   - Install if missing: `pip install playwright pillow --break-system-packages && python3 -m playwright install chromium`.
+4. Refill `vqueue/` to at least 7 reels: new folders numbered after the highest id in `vqueue/` and `vpublished/`, each with a `reel.json` (spec below), then `python3 autopilot/reels_engine/make_reel.py --sheet <ids>` to check the key frames (fix overflowing lines by lowering their `s` size or shortening), then `python3 autopilot/reels_engine/make_reel.py <ids>` to render `reel.mp4` + `cover.jpg`. Lean towards the best Instagram themes.
+5. Refill the queue to 14 posts: new folders numbered after the highest id in `queue/` and `published/`. Lean towards the two best themes (about 60%), keep at least one `engagement` post (question for teachers, ends with `ask`) and one `teacher_tips` value post. Then `python3 autopilot/render_posts.py --sheet /tmp/sheet.png`, look at the sheet, and fix any text that wraps badly or overflows (shorten it), re-render, commit and push.
+   - Install if missing: `pip install playwright pillow numpy --break-system-packages && python3 -m playwright install chromium`.
 
 ## Content rules (for new posts)
 - Facts you may use (nothing else; never invent prices, results, clients or numbers):
@@ -49,3 +61,17 @@ Runs as two scheduled tasks. Everything a run needs is in this folder.
 - Phone: 07746451098. Sign-off line: «أثر أكاديمي.. محتوى تعليمي يترك أثر». Iraqi dialect, short sentences, Western digits (0-9) everywhere.
 - `post.json` keys: `theme` (interactive_books | talking_book | schools_offer | postgrad | mulzama | engagement | teacher_tips), `illus` (atom | wave | cell | letter | latin | book | slide | question | versus | list), `kicker`, `title` (max 2 short lines, `\n` between them, one `*accent*`), `sub` (one line), `bullets` (max 3 short chips; for `list` up to 5 items + `listTop`), `caption` (emoji allowed, ends with phone + sign-off + 4–7 hashtags), optional `ask` (replaces phone pill with a call to comment), `glyph`, `school`, `subject`, `grade`.
 - No emoji inside the poster itself (only in captions). Any made-up number on a poster must say «مثال».
+
+## Reel spec (`vqueue/<id>/reel.json`, rendered by `reels_engine/make_reel.py`, 18 s, 1080x1920)
+```json
+{"theme":"interactive_books",
+ "hook":[{"l":"الطالب|يحفظ|القانون…","s":92,"m":1},{"l":"بس|*ما يفهمه*؟","s":130}],
+ "demo":{"lines":["خلّي|القانون","*يتحرك*|قدامه"],"illus":"wave"},
+ "benefits":{"lines":[{"l":"الفيزياء|التفاعلية","s":84,"m":1},{"l":"للسادس|*العلمي*","s":120}],"chips":["...","...","..."]},
+ "cta":{"lines":[{"l":"اطلب|نسخة|تجريبية","s":84,"m":1},{"l":"*لمدرستك*|هسه","s":124}]},
+ "caption":"... ends with phone, sign-off and hashtags"}
+```
+- `|` separates words (each word animates in), `*word*` is the one gold accent, `s` = font px, `m:1` = muted smaller line. Keep each line ≤ about 900 px wide (3–4 short words at 110–130 px; long lines 74–92 px).
+- `illus`: atom | wave | cell | letter (`glyph`) | latin | book (`school`,`subject`,`grade`) | slide | versus | question.
+- Timeline is fixed: hook 0–2.8 s, demo 2.8–8.5 s (hero beat at 5.6 s), benefits 8.9–13 s, call to action + phone 13.2–18 s.
+- `vqueue/001`–`005` are prebuilt reels (`"prebuilt": true`); never re-render those.

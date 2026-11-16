@@ -1,0 +1,118 @@
+<!doctype html><html dir="rtl" lang="ar"><head><meta charset="utf-8"><style>
+@font-face{font-family:Cairo;font-weight:700;src:url(../fonts/cairo-arabic-700-normal.woff2)}
+@font-face{font-family:Cairo;font-weight:800;src:url(../fonts/cairo-arabic-800-normal.woff2)}
+@font-face{font-family:Cairo;font-weight:900;src:url(../fonts/cairo-arabic-900-normal.woff2)}
+@font-face{font-family:CairoL;font-weight:700;src:url(../fonts/cairo-latin-700-normal.woff2)}
+@font-face{font-family:CairoL;font-weight:800;src:url(../fonts/cairo-latin-800-normal.woff2)}
+@font-face{font-family:CairoL;font-weight:900;src:url(../fonts/cairo-latin-900-normal.woff2)}
+@font-face{font-family:Tajawal;font-weight:700;src:url(../fonts/tajawal-arabic-700-normal.woff2)}
+@font-face{font-family:Naskh;font-weight:700;src:url(../fonts/naskh-700.woff2)}
+:root{--bg1:#0A1030;--bg2:#1D2D72;--ink:#F5F2EA;--muted:#AEB8DD;--acc:#F7B731;--card:rgba(255,255,255,.07);--line:rgba(255,255,255,.14)}
+html,body{margin:0;width:1080px;height:1920px;overflow:clip;background:var(--bg1);font-family:Cairo,CairoL,sans-serif;color:var(--ink)}
+.abs{position:absolute}
+#bg{inset:0;background:radial-gradient(1200px 1300px at 70% 18%,var(--bg2),var(--bg1) 70%);z-index:0}
+#dots{inset:-50px;z-index:1;opacity:.22;background-image:radial-gradient(rgba(255,255,255,.55) 1.6px,transparent 1.8px);background-size:44px 44px}
+#glow{width:900px;height:900px;border-radius:50%;left:90px;top:520px;z-index:1;background:radial-gradient(circle,rgba(247,183,49,.16),transparent 65%)}
+#grain{inset:0;z-index:50;opacity:.085;background-size:1080px 1920px;mix-blend-mode:overlay}
+#vig{inset:0;z-index:51;background:radial-gradient(ellipse at 50% 45%,transparent 55%,rgba(0,0,0,.55) 100%)}
+.tag{z-index:40;top:150px;left:50%;padding:10px 34px;border:2px solid var(--line);border-radius:60px;font:800 38px Cairo;background:rgba(255,255,255,.05);white-space:nowrap}
+.tag b{color:var(--acc)}
+.line{position:absolute;left:30px;right:30px;display:flex;justify-content:center;gap:24px;line-height:1.25;z-index:20}
+.w{display:inline-block;overflow:hidden;padding:0 4px 14px}.w>span{display:inline-block}
+.acc{color:var(--acc)}
+#scr{z-index:10;left:90px;top:700px;width:900px;height:600px;border-radius:40px;border:16px solid #2a3570;box-sizing:border-box;overflow:hidden;box-shadow:0 40px 90px rgba(0,0,0,.45);background:radial-gradient(circle at 50% 50%,#24347f,#101740)}
+#scr .lay{position:absolute;inset:0}
+.chip{display:inline-flex;align-items:center;gap:14px;padding:14px 34px;border-radius:28px;background:var(--card);border:2px solid var(--line);font:800 50px Cairo,CairoL;white-space:nowrap}
+.chip i{width:18px;height:18px;border-radius:50%;background:var(--acc);display:inline-block}
+#chips{z-index:20;left:0;right:0;top:820px;display:flex;flex-direction:column;align-items:center;gap:26px}
+#phone{z-index:20;left:110px;right:110px;top:1260px;height:180px;border-radius:90px;background:var(--acc);color:#0A1030;display:flex;align-items:center;justify-content:center;gap:28px;font:900 90px CairoL,Cairo;box-shadow:0 30px 80px rgba(247,183,49,.35)}
+#brand{top:1480px;z-index:20;left:0;right:0;text-align:center;font:700 48px Tajawal;color:var(--muted)}
+#flash{z-index:15;inset:0;background:radial-gradient(circle at 50% 52%,rgba(247,183,49,.5),transparent 60%);opacity:0}
+.ring{position:absolute;width:40px;height:40px;margin:-20px 0 0 -20px;border-radius:50%;border:6px solid #F7B731;opacity:0}
+#ptr{position:absolute;width:76px;height:76px;margin:-38px 0 0 -38px;border-radius:50%;background:rgba(255,255,255,.55);border:6px solid #fff;box-shadow:0 8px 24px rgba(0,0,0,.35);opacity:0;z-index:6}
+</style></head><body><div id="stage" style="position:fixed;inset:0;overflow:clip">
+<div id="bg" class="abs"></div><div id="dots" class="abs"></div><div id="glow" class="abs"></div>
+<div class="tag abs" id="tag"><b>أثر</b> أكاديمي</div>
+<div id="g_hook" class="abs" style="inset:0;z-index:20"></div>
+<div id="g_demo" class="abs" style="inset:0;z-index:20"></div>
+<div id="flash" class="abs"></div>
+<div id="scr" class="abs"><div class="lay" id="ill"></div><div class="ring" id="r0"></div><div class="ring" id="r1"></div><div id="ptr"></div></div>
+<div id="g_ben" class="abs" style="inset:0;z-index:20"></div>
+<div id="chips" class="abs"></div>
+<div id="g_cta" class="abs" style="inset:0;z-index:20"></div>
+<div id="phone" class="abs"><svg width="80" height="80" viewBox="0 0 24 24"><path fill="#0A1030" d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25 11.4 11.4 0 0 0 3.6.57 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.57 3.57a1 1 0 0 1-.25 1z"/></svg><span dir="ltr">07746451098</span></div>
+<div id="brand" class="abs">أثر أكاديمي.. محتوى تعليمي يترك أثر</div>
+<div id="grain" class="abs"></div><div id="vig" class="abs"></div>
+<script>
+/* REEL json: {hook:[{l:"أستاذ،",s:96,m:1},{l:"طلابك|*يملّون*",s:140}], demo:{lines:["خلّي|الدرس","*يتحرك*|قدامهم"], illus:"atom", glyph, school, subject, grade},
+   benefits:{lines:[{l:"كتب|تفاعلية",s:84,m:1},{l:"*لكل*|المواد",s:120}], chips:["..","..",".."]}, cta:{lines:[{l:"احجز|عرض",s:84,m:1},{l:"*لمدرستك*|هسه",s:124}]} } */
+const R=window.REEL||{hook:[{l:"عنوان|*مثال*",s:130}],demo:{lines:["سطر|*مثال*"],illus:"atom"},benefits:{lines:[{l:"فوائد",s:110}],chips:["أولى","ثانية"]},cta:{lines:[{l:"تواصل|*ويانا*",s:120}]}};
+const TL={hookIn:-0.45,hookOut:2.75,demoIn:2.8,scrIn:3.05,hero:5.6,demoOut:8.5,scrOut:8.45,benIn:8.85,chips:9.6,benOut:12.9,ctaIn:13.2,phone:14.3,brand:14.9,end:18};
+window.TL=TL;
+const clamp=x=>Math.max(0,Math.min(1,x));
+const bez=(x1,y1,x2,y2)=>t=>{if(t<=0)return 0;if(t>=1)return 1;let lo=0,hi=1,u=t;for(let i=0;i<30;i++){u=(lo+hi)/2;const x=3*(1-u)*(1-u)*u*x1+3*(1-u)*u*u*x2+u*u*u;if(x<t)lo=u;else hi=u}return 3*(1-u)*(1-u)*u*y1+3*(1-u)*u*u*y2+u*u*u};
+const eOut=bez(.16,1,.3,1),eIn=bez(.6,0,.9,.35),eIO=bez(.65,0,.35,1),eOver=bez(.55,0,.2,1.12);
+const spring=(t,d=14,k=140,m=.8)=>{if(t<=0)return 0;const w0=Math.sqrt(k/m),z=d/(2*Math.sqrt(k*m));if(z>=1)return 1-Math.exp(-w0*t)*(1+w0*t);const wd=w0*Math.sqrt(1-z*z);return 1-Math.exp(-z*w0*t)*(Math.cos(wd*t)+z*w0/wd*Math.sin(wd*t))};
+const P=(t,a,b,e)=>e(clamp((t-a)/(b-a)));const lerp=(a,b,p)=>a+(b-a)*p;const $=id=>document.getElementById(id);
+function buildLines(id,arr,top){const G=$(id);let y=top;const out=[];arr.forEach(o=>{if(typeof o==='string')o={l:o,s:120};const s=o.s||120;const L=document.createElement('div');L.className='line';L.style.top=y+'px';L.style.font=`${o.m?800:900} ${s}px Cairo,CairoL`;if(o.m)L.style.color='var(--muted)';o.l.split('|').forEach(w=>{const a=w.startsWith('*');w=w.replace(/\*/g,'');L.insertAdjacentHTML('beforeend',`<span class="w"><span class="${a?'acc':''}">${w}</span></span>`)});G.appendChild(L);out.push([...L.querySelectorAll('.w>span')]);y+=Math.round(s*1.3)+10});return out}
+function reveal(groups,t,tIn,tOut,step=.09){let k=0;groups.forEach(g=>g.forEach(s=>{const a=tIn+k*step;k++;const p=P(t,a,a+.8,eOut),x=P(t,tOut+k*.03,tOut+k*.03+.38,eIn);s.style.transform=`translateY(${(1-p)*135-x*140}%) rotate(${(1-p)*4}deg)`}))}
+const hookTop=R.hook.length>=3?560:640;
+const LH=buildLines('g_hook',R.hook,hookTop);
+const LD=buildLines('g_demo',R.demo.lines.map((l,i)=>typeof l==='string'?{l,s:i?112:100,m:0}:l),R.demo.lines.length>1?340:420);
+const LB=buildLines('g_ben',R.benefits.lines,R.benefits.lines.length>1?420:540);
+const LC=buildLines('g_cta',R.cta.lines,R.cta.lines.length>2?520:600);
+$('chips').innerHTML=(R.benefits.chips||[]).slice(0,4).map(c=>`<span class="chip"><i></i>${c}</span>`).join('');
+const chips=[...document.querySelectorAll('#chips .chip')];
+if(R.benefits.chips&&R.benefits.chips.length>3)$('chips').style.top='780px';
+// ---------- illustrations (u = seconds since screen in) ----------
+const D=R.demo,ILL=$('ill');let tick=()=>{};
+const svgNS='http://www.w3.org/2000/svg';
+function atomSVG(id){return `<svg id="${id}" width="868" height="568" viewBox="-434 -284 868 568">${[0,1,2].map(i=>`<g id="${id}o${i}"><ellipse rx="300" ry="96" fill="none" stroke="rgba(255,255,255,.38)" stroke-width="6"/><circle id="${id}e${i}" r="22" fill="#F5F2EA"/></g>`).join('')}<circle id="${id}n" r="60" fill="#F7B731"/></svg>`}
+function atomTick(id,t){[0,1,2].forEach(i=>{$(id+'o'+i).setAttribute('transform',`rotate(${i*60+t*14})`);const a=t*(2.2+i*.5)+i*2;$(id+'e'+i).setAttribute('cx',300*Math.cos(a));$(id+'e'+i).setAttribute('cy',96*Math.sin(a))});$(id+'n').setAttribute('r',60+Math.sin(t*3)*4)}
+const taps=[];
+const tapAt=(u,x,y)=>taps.push([u,x,y]);
+function pointerTick(u){if(!taps.length)return;const p=$('ptr');let pos=[760,620],press=0,vis=clamp((u-.3)/.3)*(1-clamp((u-5)/.3));
+  for(let i=0;i<taps.length;i++){const [tu,x,y]=taps[i],prev=i?taps[i-1]:[0.3,760,620];if(u<=tu){const q=eIO(clamp((u-prev[0])/(tu-prev[0])));pos=[lerp(prev[1],x,q),lerp(prev[2],y,q)];break}pos=[x,y];press=Math.max(press,Math.exp(-Math.pow((u-tu)/.07,2)))}
+  p.style.left=pos[0]+'px';p.style.top=pos[1]+'px';p.style.opacity=vis;p.style.transform=`scale(${1-press*.2})`;
+  let last=null;taps.forEach(tp=>{if(u>=tp[0])last=tp});[0,1].forEach(j=>{const r=$('r'+j);if(!last){r.style.opacity=0;return}const dt=u-last[0]-j*.12;r.style.left=last[1]+'px';r.style.top=last[2]+'px';if(dt<0||dt>.9){r.style.opacity=0;return}r.style.opacity=(1-dt/.9)*.9;r.style.transform=`scale(${1+dt*8})`})}
+const bounce=(u,u0)=>u<u0?0:Math.exp(-(u-u0)*5)*Math.sin((u-u0)*16)*.14;
+const H0=TL.hero-TL.scrIn; // hero moment in u
+({
+atom(){ILL.innerHTML=atomSVG('A');tick=u=>{atomTick('A',u);const b=bounce(u,H0);$('A').style.transform=`scale(${1+b})`}},
+wave(){ILL.innerHTML=`<svg width="868" height="568" viewBox="0 0 868 568"><line x1="40" y1="284" x2="828" y2="284" stroke="rgba(255,255,255,.25)" stroke-width="4"/><path id="wv" fill="none" stroke="#F7B731" stroke-width="12" stroke-linecap="round"/><circle id="wb" r="22" fill="#F5F2EA"/></svg>`;
+  tick=u=>{const amp=lerp(30,150,P(u,.3,H0,eOut));let d='';for(let x=40;x<=828;x+=8){const y=284-amp*Math.sin((x-40)/788*Math.PI*4-u*4);d+=(x==40?'M':'L')+x+' '+y.toFixed(1)}$('wv').setAttribute('d',d);const bx=434;$('wb').setAttribute('cx',bx);$('wb').setAttribute('cy',284-amp*Math.sin((bx-40)/788*Math.PI*4-u*4))}},
+cell(){ILL.innerHTML=`<svg width="868" height="568" viewBox="0 0 868 568"><ellipse id="cm" cx="434" cy="284" rx="330" ry="200" fill="rgba(174,184,221,.15)" stroke="rgba(255,255,255,.55)" stroke-width="9"/><circle id="cn" cx="450" cy="270" r="84" fill="#F7B731"/><circle cx="468" cy="255" r="26" fill="#c98a10"/>${[0,1,2,3,4].map(i=>`<ellipse id="co${i}" rx="${44-i*4}" ry="18" fill="#F5F2EA" opacity=".85"/>`).join('')}</svg>`;
+  tick=u=>{$('cm').setAttribute('rx',330+Math.sin(u*1.6)*8);$('cm').setAttribute('ry',200+Math.cos(u*1.6)*6);$('cn').setAttribute('r',84*(1+bounce(u,H0)));[0,1,2,3,4].forEach(i=>{const a=u*.6+i*1.26;$('co'+i).setAttribute('cx',434+220*Math.cos(a));$('co'+i).setAttribute('cy',284+120*Math.sin(a));$('co'+i).setAttribute('transform',`rotate(${a*40} ${434+220*Math.cos(a)} ${284+120*Math.sin(a)})`)})}},
+letter(){$('scr').style.background='linear-gradient(160deg,#FFF8E8,#F3E7C9)';ILL.innerHTML=`<div id="gl" style="position:absolute;left:0;right:0;top:120px;text-align:center;font:700 300px/1 Naskh;color:#1D2D72;transform-origin:50% 55%">${D.glyph||'بَ'}</div><svg style="position:absolute;bottom:24px;left:30px" width="120" height="90" viewBox="0 0 120 90"><path d="M10 32h18l24-20v66L28 58H10z" fill="#1D2D72"/><path id="sw" d="M66 30q12 15 0 30M80 20q22 25 0 50M94 10q32 35 0 70" stroke="#F7B731" stroke-width="7" fill="none" stroke-linecap="round"/></svg>`;
+  tapAt(1.2,434,300);tapAt(H0,434,300);tick=u=>{const b=Math.max(bounce(u,1.2),bounce(u,H0));$('gl').style.transform=`scale(${1+b})`;$('gl').style.color=((u>1.2&&u<1.9)||(u>H0&&u<H0+.9))?'#E09A0E':'#1D2D72';let w=0;[1.2,H0].forEach(x=>{if(u>x)w=Math.max(w,Math.exp(-(u-x)*1.6))});$('sw').style.opacity=.2+.8*w}},
+latin(){$('scr').style.background='linear-gradient(160deg,#FFF8E8,#F3E7C9)';ILL.innerHTML=`<div id="gl" dir="ltr" style="position:absolute;left:0;right:0;top:150px;text-align:center;font:900 260px/1 CairoL;color:#1D2D72;transform-origin:50% 55%">A<span style="color:#E09A0E">a</span></div>`;
+  tapAt(1.2,434,300);tapAt(H0,434,300);tick=u=>{$('gl').style.transform=`scale(${1+Math.max(bounce(u,1.2),bounce(u,H0))})`}},
+book(){$('scr').style.background='radial-gradient(circle at 50% 50%,#24347f,#101740)';ILL.innerHTML=`<div id="bk" style="position:absolute;left:300px;top:40px;width:270px;height:470px">${[3,2,1].map(i=>`<div id="pg${i}" style="position:absolute;inset:0;border-radius:12px;background:#e9e4d6"></div>`).join('')}<div style="position:absolute;inset:0;border-radius:12px;background:linear-gradient(165deg,#1D2D72,#0E1748);border:3px solid rgba(255,255,255,.18);box-shadow:0 30px 70px rgba(0,0,0,.5);overflow:hidden"><div style="height:10px;background:#F7B731"></div><div style="margin:30px auto 0;width:96px;height:96px;border-radius:50%;border:4px dashed rgba(247,183,49,.85);display:flex;align-items:center;justify-content:center;font:800 20px/1.2 Cairo;color:#F7B731;text-align:center">شعار<br>مدرستك</div><div style="text-align:center;margin-top:22px;font:900 28px Cairo">${D.school||'اسم مدرستك'}</div><div style="text-align:center;margin-top:30px;font:900 50px Cairo;color:#F7B731">${D.subject||'الكيمياء'}</div><div style="text-align:center;font:700 26px Tajawal;color:#AEB8DD">${D.grade||'السادس العلمي'}</div></div></div><div id="stp" style="position:absolute;left:60px;top:400px;padding:6px 26px;border-radius:14px;border:6px solid #F7B731;color:#F7B731;font:900 46px Cairo;background:rgba(10,16,48,.6)">جاهزة للطباعة</div>`;
+  tick=u=>{[1,2,3].forEach(i=>{const s=spring(u-1.2-(i-1)*.15,14,160,.8);$('pg'+i).style.transform=`translate(${-s*i*16}px,${s*i*14}px) rotate(${-s*i*1.5}deg)`});const st=spring(u-H0,9,220,.7);$('stp').style.opacity=clamp((u-H0)/.08);$('stp').style.transform=`rotate(-10deg) scale(${lerp(2.2,1,st)})`;$('bk').style.transform=`rotate(${Math.sin(u*.9)*.8}deg)`}},
+slide(){ILL.innerHTML=`<div id="old" style="position:absolute;inset:0;background:#fbfbf8"><div style="position:absolute;top:30px;right:40px;font:700 46px Tajawal;color:#222">نتائج الدراسة</div>${Array.from({length:12},(_,i)=>`<div style="position:absolute;right:40px;top:${110+i*34}px;height:14px;border-radius:7px;background:#c9c9c4;width:${520+((i*137)%300)}px"></div>`).join('')}</div><div id="nw" style="position:absolute;inset:0;background:linear-gradient(150deg,#1D2D72,#0A1030)"><div style="position:absolute;top:30px;right:44px;font:900 54px Cairo;color:#F7B731">نتائج الدراسة</div><div style="position:absolute;top:40px;left:40px;font:700 26px Tajawal;color:rgba(174,184,221,.75);border:2px solid rgba(174,184,221,.35);border-radius:12px;padding:0 12px">مثال</div><div style="position:absolute;left:40px;width:470px;bottom:66px;height:4px;background:rgba(255,255,255,.3)"></div>${[150,210,180,330].map((h,i)=>`<div id="b${i}" style="position:absolute;bottom:70px;left:${60+i*110}px;width:84px;border-radius:12px 12px 4px 4px;background:${i==3?'#F7B731':'#3b4a95'}"></div>`).join('')}<div style="position:absolute;right:60px;top:200px;text-align:center"><b id="num" dir="ltr" style="display:block;font:900 140px/1 CairoL">0%</b><span style="font:700 34px Tajawal;color:#AEB8DD">نسبة التحسّن</span></div></div>`;
+  const H=[150,210,180,330];tick=u=>{const m=P(u,1.0,1.7,eIO);$('nw').style.clipPath=`inset(0 0 0 ${(1-m)*100}%)`;H.forEach((h,i)=>{$('b'+i).style.height=h*P(u,1.6+i*.15,2.5+i*.15,eOver)+'px'});$('num').textContent=Math.round(87*P(u,1.7,H0,eOut))+'%';$('num').style.color=u>H0?'#F7B731':'#F5F2EA'}},
+versus(){ILL.innerHTML=`<div id="ch" style="position:absolute;inset:0;background:radial-gradient(circle at 40% 40%,#2f4a3c,#1d3128)"><div style="position:absolute;top:80px;right:60px;font:700 58px Tajawal;color:#e8e6dc;opacity:.9">الدرس اليوم</div><div style="position:absolute;top:220px;right:60px;left:60px;height:6px;background:rgba(232,230,220,.25)"></div><div style="position:absolute;top:270px;right:60px;width:520px;height:6px;background:rgba(232,230,220,.18)"></div></div><div id="sm" style="position:absolute;inset:0">${atomSVG('V')}</div>`;
+  tick=u=>{const m=P(u,1.6,2.3,eIO);$('ch').style.clipPath=`circle(${(1-m)*120}% at 50% 50%)`;$('sm').style.clipPath=`circle(${m*75}% at 50% 50%)`;$('scr').style.borderColor=`rgb(${lerp(58,42,m)},${lerp(65,53,m)},${lerp(82,112,m)})`;atomTick('V',u)}},
+question(){ILL.innerHTML=`<div id="q" style="position:absolute;left:0;right:0;top:40px;text-align:center;font:900 420px/1.1 Cairo;color:#F7B731;transform-origin:50% 60%">؟</div>`;
+  tick=u=>{$('q').style.transform=`scale(${1+bounce(u,1)+bounce(u,H0)}) rotate(${Math.sin(u*2)*4}deg)`}}
+})[D.illus]();
+// ---------- grain ----------
+let seed=12345;const rnd=()=>(seed=(seed*1103515245+12345)%2147483648)/2147483648;
+const grains=[];for(let g=0;g<4;g++){const c=document.createElement('canvas');c.width=540;c.height=960;const x=c.getContext('2d'),im=x.createImageData(540,960);for(let i=0;i<im.data.length;i+=4){const v=rnd()*255;im.data[i]=im.data[i+1]=im.data[i+2]=v;im.data[i+3]=255}x.putImageData(im,0,0);grains.push(`url(${c.toDataURL()})`)}
+// ---------- seek ----------
+window.seek=async t=>{
+  $('dots').style.transform=`translateY(${(t*10)%44}px)`;$('glow').style.transform=`translate(${Math.sin(t*.5)*40}px,${Math.cos(t*.4)*30}px)`;$('grain').style.backgroundImage=grains[Math.floor(t*15)%4];
+  $('tag').style.transform=`translateX(-50%) translateY(${Math.sin(t*1.6)*4}px)`;
+  reveal(LH,t,TL.hookIn,TL.hookOut);reveal(LD,t,TL.demoIn,TL.demoOut);reveal(LB,t,TL.benIn,TL.benOut);reveal(LC,t,TL.ctaIn,99,.1);
+  const si=spring(t-TL.scrIn,15,180,.8),so=P(t,TL.scrOut,TL.scrOut+.45,eIn);
+  $('scr').style.opacity=clamp(P(t,TL.scrIn,TL.scrIn+.25,eOut))*(1-so);
+  $('scr').style.transform=`translateY(${(1-si)*160+Math.sin(t*1.3)*5-so*120}px) scale(${lerp(.85,1,si)*(1-so*.15)})`;
+  const u=t-TL.scrIn;tick(u);pointerTick(u);
+  $('flash').style.opacity=t>TL.hero?Math.exp(-(t-TL.hero)*2.5)*(1-so):0;
+  const co=P(t,TL.benOut,TL.benOut+.45,eIn);
+  chips.forEach((c,i)=>{const a=TL.chips+i*.22,s=spring(t-a,14,160,.8),o=P(t,a,a+.3,eOut);c.style.opacity=o*(1-co);c.style.transform=`translateX(${(1-s)*240}px) translateY(${-co*70}px)`});
+  const ph=spring(t-TL.phone,11,210,.7),pho=P(t,TL.phone,TL.phone+.25,eOut);$('phone').style.opacity=pho;$('phone').style.transform=`translateY(${(1-ph)*90}px) scale(${lerp(.9,1,ph)+Math.sin(t*2.4)*.012*clamp(t-TL.phone-1)})`;
+  const br=P(t,TL.brand,TL.brand+.8,eOut);$('brand').style.opacity=br;$('brand').style.transform=`translateY(${(1-br)*30}px)`;
+};
+Promise.all(['900 10px Cairo','800 10px Cairo','700 10px Tajawal','900 10px CairoL','800 10px CairoL','700 10px Naskh'].map(f=>document.fonts.load(f,'بَ أب Aa 07'))).then(()=>document.fonts.ready).then(()=>{seek(0);window.ready=true});
+</script></div></body></html>
