@@ -8,7 +8,8 @@ import json, sys, pathlib, asyncio, io
 from playwright.async_api import async_playwright
 from PIL import Image
 ROOT = pathlib.Path(__file__).resolve().parent
-Q = ROOT / 'queue'
+import os
+Q = pathlib.Path(os.environ.get('Q_DIR', ROOT / 'queue'))
 async def main():
     allf = '--all' in sys.argv
     items = sorted(p for p in Q.iterdir() if (p / 'post.json').exists())
@@ -18,10 +19,16 @@ async def main():
         for d in todo:
             post = json.loads((d / 'post.json').read_text(encoding='utf-8'))
             pg = await b.new_page(viewport={'width': 1080, 'height': 1350})
-            await pg.add_init_script('window.POST=' + json.dumps(post, ensure_ascii=False) + ';')
-            await pg.goto((ROOT / 'poster.html').as_uri())
+            if post.get('style'):  # one of the 7 motion styles, rendered as a still
+                await pg.add_init_script('window.REEL=' + json.dumps(post, ensure_ascii=False) + ';')
+                await pg.goto((ROOT / 'reels_engine' / 'styles_tpl.html').as_uri() + '?fmt=post')
+            else:
+                await pg.add_init_script('window.POST=' + json.dumps(post, ensure_ascii=False) + ';')
+                await pg.goto((ROOT / 'poster.html').as_uri())
             await pg.wait_for_function('window.ready===true')
             await pg.evaluate('new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)))')
+            bad = [] if post.get('style') else await pg.evaluate('''()=>{const o=[];['title','sub','kick'].forEach(id=>{const e=document.getElementById(id);if(e&&e.scrollWidth>e.clientWidth+2)o.push(id)});const t=document.getElementById('title');if(t&&t.getBoundingClientRect().height>290)o.push('title>2 lines');const s=document.getElementById('sub');if(s&&s.getBoundingClientRect().height>80)o.push('sub wraps');const ch=document.getElementById('chips');if(ch&&ch.getBoundingClientRect().bottom>1186)o.push('chips too tall');const l=document.getElementById('list');if(l&&l.getBoundingClientRect().bottom>1182)o.push('list too tall');return o}''')
+            if bad: print('CHECK', d.name, bad)
             png = await pg.screenshot(type='png')
             Image.open(io.BytesIO(png)).convert('RGB').save(d / 'post.jpg', quality=92)
             await pg.close(); print('rendered', d.name)
