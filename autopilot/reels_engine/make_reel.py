@@ -12,8 +12,13 @@ STPL = (HERE / 'styles_tpl.html').as_uri()
 
 def tpl_for(reel): return STPL if reel.get('style') else TPL
 
+def dur_for(reel): return 22.0 if reel.get('quiz') else DUR
+
 def cues_for(reel):
     if not reel.get('style'): return HERO, CUES
+    if reel.get('quiz'):
+        n = len(reel['items']); hero = 2.8 + 10.9
+        return hero, {"whoosh": [2.75, 16.9], "pop": [3.4 + i * .35 for i in range(n)] + [3.7 + k for k in range(10)] + [18.3], "impact": [hero]}
     if reel['style'] == 'split':
         k = len(reel['split']['rows']); hero = 2.8 + 0.9 + (k - 1) * .55 + 1.0
         pops = [2.8 + 0.9 + i * .55 for i in range(k)]
@@ -22,6 +27,10 @@ def cues_for(reel):
         pops = [2.8 + 0.7 + i * st for i in range(n)]; hero = pops[-1] + 0.2
     return hero, {"whoosh": [2.75, 12.9], "pop": pops + [14.3], "impact": [hero]}
 FPS, DUR = 30, 18.0
+# HD for Instagram/Facebook: 1080x1920, 30 fps CFR, high profile, generous bitrate so the platforms recompress less
+HD = ['-c:v', 'libx264', '-preset', 'slow', '-crf', '17', '-profile:v', 'high', '-level', '4.2', '-pix_fmt', 'yuv420p',
+      '-r', '30', '-g', '60', '-maxrate', '15M', '-bufsize', '30M']
+THEME = HERE / 'theme.wav'
 HERO = 5.6
 CUES = {"whoosh": [2.8, 8.45, 13.1], "pop": [3.4, 9.6, 9.82, 10.04, 10.26, 14.3], "impact": [HERO]}
 
@@ -37,22 +46,25 @@ async def shots(reel, times, sink):
 
 def part(reel, f0, f1, out):
     ff = subprocess.Popen(['ffmpeg', '-v', 'error', '-y', '-f', 'image2pipe', '-framerate', str(FPS), '-c:v', 'mjpeg', '-i', '-',
-                           '-c:v', 'libx264', '-preset', 'veryfast', '-crf', '21', '-pix_fmt', 'yuv420p', out], stdin=subprocess.PIPE)
+                           *HD, out], stdin=subprocess.PIPE)
     asyncio.run(shots(reel, [i / FPS for i in range(f0, f1)], lambda t, b: ff.stdin.write(b)))
     ff.stdin.close(); ff.wait()
 
 def make(rid):
     d = VQ / rid; reel = json.loads((d / 'reel.json').read_text(encoding='utf-8'))
-    tmp = pathlib.Path(tempfile.mkdtemp()); n = int(DUR * FPS); cuts = [0, n // 3, 2 * n // 3, n]
+    tmp = pathlib.Path(tempfile.mkdtemp()); D = dur_for(reel); n = int(D * FPS); cuts = [0, n // 3, 2 * n // 3, n]
     ps = [Process(target=part, args=(reel, cuts[i], cuts[i + 1], str(tmp / f'p{i}.mp4'))) for i in range(3)]
     [p.start() for p in ps]; [p.join() for p in ps]
     (tmp / 'l.txt').write_text(''.join(f"file '{tmp / f'p{i}.mp4'}'\n" for i in range(3)))
     subprocess.run(['ffmpeg', '-v', 'error', '-y', '-f', 'concat', '-safe', '0', '-i', str(tmp / 'l.txt'), '-c', 'copy', str(tmp / 'v.mp4')], check=True)
     hero, cues = cues_for(reel)
-    subprocess.run([sys.executable, str(HERE / 'audio.py'), str(tmp / 'a.wav'), str(DUR), str(hero), '2.8', json.dumps(cues)], check=True)
+    theme = HERE / f'theme_{int(D)}.wav'
+    if not theme.exists(): subprocess.run([sys.executable, str(HERE / 'theme_music.py'), str(theme), str(D)], check=True)
+    subprocess.run([sys.executable, str(HERE / 'audio.py'), str(tmp / 'a.wav'), str(D), str(hero), '2.8', json.dumps(cues)], check=True, env={**os.environ, 'NO_MUSIC': '1'})
     part_out = d / 'reel.part.mp4'
-    subprocess.run(['ffmpeg', '-v', 'error', '-y', '-i', str(tmp / 'v.mp4'), '-i', str(tmp / 'a.wav'), '-map', '0:v', '-map', '1:a', '-c:v', 'copy',
-                    '-c:a', 'aac', '-b:a', '160k', '-af', 'loudnorm=I=-14:TP=-1.5', '-shortest', '-movflags', '+faststart', str(part_out)], check=True)
+    subprocess.run(['ffmpeg', '-v', 'error', '-y', '-i', str(tmp / 'v.mp4'), '-i', str(theme), '-i', str(tmp / 'a.wav'),
+                    '-filter_complex', '[1:a]volume=0.85[m];[2:a]volume=0.45,aformat=channel_layouts=stereo[s];[m][s]amix=inputs=2:normalize=0,loudnorm=I=-14:TP=-1.5,aresample=48000[a]',
+                    '-map', '0:v', '-map', '[a]', '-c:v', 'copy', '-c:a', 'aac', '-b:a', '192k', '-ar', '48000', '-shortest', '-movflags', '+faststart', str(part_out)], check=True)
     part_out.rename(d / 'reel.mp4')
     subprocess.run(['ffmpeg', '-v', 'error', '-y', '-ss', '6.2', '-i', str(d / 'reel.mp4'), '-frames:v', '1', '-q:v', '3', str(d / 'cover.jpg')], check=True)
     print('made', rid, (d / 'reel.mp4').stat().st_size // 1024, 'KB')

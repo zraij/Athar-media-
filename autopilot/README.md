@@ -45,14 +45,27 @@ Runs as two scheduled tasks. Everything a run needs is in this folder.
    - Windsor `execute_action`: connector `instagram`, action `create_video_post`, account <instagram id>, params `{"video_url": media_url, "caption": caption, "cover_url": cover_url, "share_to_feed": true}`.
    - `python3 autopilot/decide.py --channel ig record --id <id> --post-id <returned media id> --slot <current_slot>`, then commit and push (pull --rebase first if the push is rejected).
    - Result line in Arabic: which reel went out on Instagram.
+   - Right after the reel (before `record`), share it as the evening story: Windsor `execute_action` connector `instagram`, action `create_story`, params `{"video_url": media_url}`.
 5. At most one reel per run. Only from `vqueue/`.
+
+## Run D — Instagram morning story (10:07 run)
+1. `python3 autopilot/decide.py --channel igs plan --posts /tmp/ig.json` (fixed slot 10:00, today's dated item only).
+2. If `publish_now`: Windsor `execute_action` connector `instagram`, action `create_story`, params `{"image_url": media_url}` (GitHub Pages, JPEG 1080x1920), then `decide.py --channel igs record --id <id> --post-id <media id> --slot 10:00`, commit, push.
+
+## Run E — Instagram carousel (14:07 run, only on carousel days)
+1. `python3 autopilot/decide.py --channel igc plan --posts /tmp/ig.json` (fixed slot 14:00).
+2. If `publish_now`: Windsor `execute_action` connector `instagram`, action `create_carousel_post`, params `{"image_urls": next_item.media_urls, "caption": next_item.caption}`, then `decide.py --channel igc record ...`, commit, push.
+   On the same day the Facebook queue item is that carousel's cover (`queue/<date>/post.jpg`), published by Run A.
+
+## Content calendar
+Every queue (`queue/`, `vqueue/`, `squeue/`, `cqueue/`) holds one folder per date (`YYYY-MM-DD`) with a `date` field: `decide.py` only offers today's item. The plan is the doc «خطة محتوى أثر أكاديمي — شهر كامل». Old undated items wait in `queue_extra/` and `vextra/` (unused). Music: one brand track (`reels_engine/theme_music.py`) for every reel; HD export 1080x1920, 30 fps, CRF 17.
 
 ## Run B — weekly analysis + new content (Saturday 11:23 Baghdad)
 1. Steps 1–2 of Run A, plus Windsor `get_data` on `facebook_organic` with fields `date, page_follows, page_daily_follows, page_impressions` (last_30dT) for follower growth.
 2. `python3 autopilot/decide.py report --posts /tmp/posts.json --days 7` and `plan` (for slot_scores / theme_scores).
 3. Check whether Instagram reels also reached the Facebook Page: compare `log_ig.csv` times with Facebook posts that have `post_video_views` > 0 or a caption matching the reel within 30 minutes. Say in the report, in one line, whether reels are appearing on Facebook.
    Write the weekly report **in Arabic (Iraqi, simple)**, short: followers now and gained this week, best post, best time slots, best themes, what changes next week. Send it with SendUserMessage / as the run result.
-4. Refill `vqueue/` to at least 7 reels: new folders numbered after the highest id in `vqueue/` and `vpublished/`, each with a `reel.json` (spec below), then `python3 autopilot/reels_engine/make_reel.py --sheet <ids>` to check the key frames (fix overflowing lines by lowering their `s` size or shortening), then `python3 autopilot/reels_engine/make_reel.py <ids>` to render `reel.mp4` + `cover.jpg`. Lean towards the best Instagram themes.
+4. When the dated calendar runs out (fewer than 7 future dates left), extend it a week at a time in the same pattern (see the weekly rhythm in the plan doc): reels in `vqueue/<date>/`, morning stories in `squeue/<date>/` (render_cards.py), carousels twice a week in `cqueue/<date>/`, and one Facebook post per day in `queue/<date>/`. Refill `vqueue/` to at least 7 reels: new folders numbered after the highest id in `vqueue/` and `vpublished/`, each with a `reel.json` (spec below), then `python3 autopilot/reels_engine/make_reel.py --sheet <ids>` to check the key frames (fix overflowing lines by lowering their `s` size or shortening), then `python3 autopilot/reels_engine/make_reel.py <ids>` to render `reel.mp4` + `cover.jpg`. Lean towards the best Instagram themes.
 5. Refill the queue to 14 posts: new folders numbered after the highest id in `queue/` and `published/`. Lean towards the two best themes (about 60%), keep at least one `engagement` post (question for teachers, ends with `ask`) and one `teacher_tips` value post. Then `python3 autopilot/render_posts.py --sheet /tmp/sheet.png`, look at the sheet, and fix any text that wraps badly or overflows (shorten it), re-render, commit and push.
    - Install if missing: `pip install playwright pillow numpy --break-system-packages && python3 -m playwright install chromium`.
 

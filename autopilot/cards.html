@@ -1,0 +1,86 @@
+<!doctype html><html dir="rtl" lang="ar"><head><meta charset="utf-8"><style>
+@font-face{font-family:Cairo;font-weight:700;src:url(fonts/cairo-arabic-700-normal.woff2)}
+@font-face{font-family:Cairo;font-weight:800;src:url(fonts/cairo-arabic-800-normal.woff2)}
+@font-face{font-family:Cairo;font-weight:900;src:url(fonts/cairo-arabic-900-normal.woff2)}
+@font-face{font-family:CairoL;font-weight:800;src:url(fonts/cairo-latin-800-normal.woff2)}
+@font-face{font-family:CairoL;font-weight:900;src:url(fonts/cairo-latin-900-normal.woff2)}
+@font-face{font-family:Tajawal;font-weight:700;src:url(fonts/tajawal-arabic-700-normal.woff2)}
+@font-face{font-family:Naskh;font-weight:700;src:url(fonts/naskh-700.woff2)}
+:root{--bg1:#0A1030;--bg2:#1D2D72;--ink:#F5F2EA;--muted:#AEB8DD;--acc:#F7B731;--card:rgba(255,255,255,.07);--line:rgba(255,255,255,.14)}
+html,body{margin:0;overflow:clip;font-family:Cairo,CairoL,sans-serif;color:var(--ink)}
+.abs{position:absolute}
+#bg{inset:0;background:radial-gradient(1100px 1200px at 70% 18%,var(--bg2),var(--bg1) 72%)}
+#dots{inset:0;opacity:.2;background-image:radial-gradient(rgba(255,255,255,.55) 1.6px,transparent 1.8px);background-size:44px 44px}
+#grain{inset:0;opacity:.08;mix-blend-mode:overlay}
+#vig{inset:0;background:radial-gradient(ellipse at 50% 45%,transparent 55%,rgba(0,0,0,.45) 100%)}
+.tag{left:50%;transform:translateX(-50%);padding:8px 30px;border:2px solid var(--line);border-radius:60px;font:800 34px Cairo;background:rgba(255,255,255,.05);white-space:nowrap}
+.tag b{color:var(--acc)}
+.pill{display:inline-block;padding:8px 30px;border-radius:40px;background:var(--acc);color:#0A1030;font:900 40px Cairo}
+.acc{color:var(--acc)}
+.ctr{left:60px;right:60px;text-align:center}
+.it{display:flex;align-items:center;gap:26px;padding:20px 32px;border-radius:30px;background:var(--card);border:2px solid var(--line);font:800 46px/1.3 Cairo,CairoL}
+.num{flex:none;width:86px;height:86px;border-radius:50%;background:#2a3570;color:var(--acc);display:flex;align-items:center;justify-content:center;font:900 48px CairoL}
+#phone{left:200px;right:200px;height:110px;border-radius:55px;background:var(--acc);color:#0A1030;display:flex;align-items:center;justify-content:center;gap:20px;font:900 62px CairoL,Cairo}
+</style></head><body>
+<div id="bg" class="abs"></div><div id="dots" class="abs"></div><div id="root" class="abs" style="inset:0"></div><div id="grain" class="abs"></div><div id="vig" class="abs"></div>
+<script>
+/* window.CARD = {kind:'letter'|'tip'|'question'|'challenge'|'cover'|'point'|'compare'|'end', fmt:'story'|'post', ...} */
+const C=window.CARD||{kind:'tip',fmt:'story',title:'نصيحة',text:'مثال'};
+const STORY=C.fmt==='story',W=1080,H=STORY?1920:1350;
+document.documentElement.style.width=document.body.style.width=W+'px';document.documentElement.style.height=document.body.style.height=H+'px';
+const $=id=>document.getElementById(id),root=$('root');
+const acc=s=>(s||'').replace(/\*(.+?)\*/g,'<span class="acc">$1</span>').replace(/\n/g,'<br>');
+const PH='<svg width="54" height="54" viewBox="0 0 24 24"><path fill="#0A1030" d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25 11.4 11.4 0 0 0 3.6.57 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.57 3.57a1 1 0 0 1-.25 1z"/></svg>';
+const T0=STORY?320:40;
+let h=`<div class="tag abs" style="top:${T0}px"><b>أثر</b> أكاديمي</div>`;
+const phone=(top)=>`<div id="phone" class="abs" style="top:${top}px">${PH}<span dir="ltr">07746451098</span></div>`;
+if(C.kind==='letter'){$('bg').style.background='linear-gradient(170deg,#FFF8E8,#F1E2BF)';$('dots').style.opacity=.06;
+  h=`<div class="tag abs" style="top:${T0};color:#1D2D72;border-color:rgba(29,45,114,.25);background:rgba(29,45,114,.06)"><b>أثر</b> أكاديمي</div>`.replace('top:'+T0,'top:'+T0+'px')+
+  `<div class="abs ctr" style="top:${T0+150}px"><span class="pill" style="background:#1D2D72;color:#F5F2EA">حرف اليوم</span></div>
+   <div class="abs ctr" style="top:${T0+300}px;font:700 420px/1.15 Naskh;color:#1D2D72">${C.letter}</div>
+   <div class="abs ctr" style="top:${T0+860}px;display:flex;justify-content:center;gap:90px;font:700 150px/1.3 Naskh;color:#1D2D72">${C.forms.map((f,i)=>`<span style="color:${i==0?'#E09A0E':'#1D2D72'}">${f}</span>`).join('')}</div>
+   <div class="abs ctr" style="top:${T0+1110}px;font:700 110px/1.4 Naskh;color:#1D2D72">${C.word}</div>
+   <div class="abs ctr" style="top:${T0+1300}px;font:800 44px Cairo;color:#6b5a33">اسمع نطقه بكتاب «قراءتي الجديدة» الناطق</div>`;
+  root.innerHTML=h;
+}else if(C.kind==='tip'||C.kind==='question'||C.kind==='challenge'){
+  const lbl={tip:'نصيحة اليوم',question:'سؤال اليوم',challenge:'تحدي اليوم'}[C.kind];
+  const icon={tip:'<path d="M40 8a22 22 0 0 0-13 40v10h26V48A22 22 0 0 0 40 8zM29 66h22M33 74h14" fill="none" stroke="#F7B731" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>',
+    question:'<circle cx="40" cy="40" r="32" fill="none" stroke="#F7B731" stroke-width="6"/><path d="M30 31a10 10 0 1 1 14 9c-3 2-4 4-4 7M40 56v2" fill="none" stroke="#F7B731" stroke-width="6" stroke-linecap="round"/>',
+    challenge:'<circle cx="40" cy="44" r="28" fill="none" stroke="#F7B731" stroke-width="6"/><path d="M40 44V28M32 10h16M40 10v6" stroke="#F7B731" stroke-width="6" stroke-linecap="round"/>'}[C.kind];
+  h+=`<div class="abs ctr" style="top:${T0+180}px"><svg width="170" height="170" viewBox="0 0 80 80">${icon}</svg></div>
+   <div class="abs ctr" style="top:${T0+380}px"><span class="pill">${lbl}</span></div>
+   <div class="abs ctr" style="top:${T0+520}px;font:900 ${C.size||104}px/1.35 Cairo,CairoL">${acc(C.text)}</div>
+   ${C.sub?`<div class="abs ctr" style="top:${T0+1000}px;font:700 52px/1.5 Tajawal;color:var(--muted)">${acc(C.sub)}</div>`:''}
+   <div class="abs ctr" style="top:${T0+1250}px;font:800 46px Cairo;color:var(--muted)">${C.kind==='tip'?'احفظها وشاركها ويا زميلك':(C.kind==='challenge'?'الريل نازل اليوم… جاوب بالتعليقات':'جاوبنا بالرسائل')}</div>`;
+  root.innerHTML=h;
+}else if(C.kind==='cover'){
+  h+=`<div class="abs ctr" style="top:130px;font:800 46px Cairo;color:var(--muted)">${C.kicker||''}</div>
+   <div class="abs ctr" style="top:220px;font:900 112px/1.25 Cairo,CairoL">${acc(C.title)}</div>
+   <div class="abs ctr" style="top:${C.title.includes('\n')?600:470}px;font:700 50px/1.5 Tajawal;color:var(--muted)">${acc(C.sub||'')}</div>
+   <div class="abs" style="left:0;right:0;top:820px;display:flex;justify-content:center;gap:16px">${Array.from({length:C.count||5},(_,i)=>`<div class="num" style="width:70px;height:70px;font-size:38px">${i+1}</div>`).join('')}</div>
+   <div class="abs ctr" style="top:1080px"><span class="pill" style="font-size:46px;padding:12px 40px">اسحب ← وشوف</span></div>`;
+  root.innerHTML=h;
+}else if(C.kind==='point'){
+  h+=`<div class="abs ctr" style="top:120px;font:800 40px Cairo;color:var(--muted)">${C.series||''}</div>
+   <div class="abs ctr" style="top:220px"><div class="num" style="margin:0 auto;width:150px;height:150px;font-size:86px">${C.n}</div></div>
+   <div class="abs ctr" style="top:420px;font:900 92px/1.3 Cairo,CairoL">${acc(C.title)}</div>
+   <div class="abs" style="left:90px;right:90px;top:${C.title.includes('\n')?720:600}px;padding:36px 44px;border-radius:36px;background:var(--card);border:2px solid var(--line);font:700 52px/1.6 Tajawal;color:#e6e9f5;text-align:center">${acc(C.text)}</div>
+   <div class="abs ctr" style="top:1200px;font:800 36px Cairo;color:var(--muted)">${C.n} / ${C.of}</div>`;
+  root.innerHTML=h;
+}else if(C.kind==='compare'){
+  h+=`<div class="abs ctr" style="top:120px;font:800 40px Cairo;color:var(--muted)">${C.series||''}</div>
+   <div class="abs ctr" style="top:200px;font:900 96px Cairo,CairoL">${acc(C.title)}</div>
+   <div class="abs" style="right:70px;width:450px;top:420px;height:600px;border-radius:36px;background:rgba(255,255,255,.05);border:2px solid var(--line);padding:40px;box-sizing:border-box;text-align:center"><div style="font:900 52px Cairo;color:#cfd3dc">${C.a}</div><div style="margin-top:50px;font:700 50px/1.5 Tajawal;color:#cfd3dc">${C.av}</div></div>
+   <div class="abs" style="left:70px;width:450px;top:420px;height:600px;border-radius:36px;background:rgba(247,183,49,.12);border:3px solid rgba(247,183,49,.7);padding:40px;box-sizing:border-box;text-align:center"><div style="font:900 52px Cairo;color:#F7B731">${C.b}</div><div style="margin-top:50px;font:700 50px/1.5 Tajawal">${C.bv}</div></div>
+   <div class="abs ctr" style="top:1200px;font:800 36px Cairo;color:var(--muted)">${C.n} / ${C.of}</div>`;
+  root.innerHTML=h;
+}else if(C.kind==='end'){
+  h+=`<div class="abs ctr" style="top:260px;font:900 104px/1.3 Cairo">${acc(C.title||'احفظ المنشور\n*وشاركه*')}</div>
+   <div class="abs ctr" style="top:600px;font:700 54px/1.5 Tajawal;color:var(--muted)">${acc(C.text||'')}</div>${phone(900)}
+   <div class="abs ctr" style="top:1080px;font:700 44px Tajawal;color:var(--muted)">أثر أكاديمي.. محتوى تعليمي يترك أثر</div>`;
+  root.innerHTML=h;
+}
+let seed=12345;const rnd=()=>(seed=(seed*1103515245+12345)%2147483648)/2147483648;
+const c=document.createElement('canvas');c.width=540;c.height=H/2;const x=c.getContext('2d'),im=x.createImageData(540,H/2);for(let i=0;i<im.data.length;i+=4){const v=rnd()*255;im.data[i]=im.data[i+1]=im.data[i+2]=v;im.data[i+3]=255}x.putImageData(im,0,0);$('grain').style.backgroundImage=`url(${c.toDataURL()})`;$('grain').style.backgroundSize=`${W}px ${H}px`;
+Promise.all(['900 10px Cairo','800 10px Cairo','700 10px Tajawal','900 10px CairoL','700 10px Naskh'].map(f=>document.fonts.load(f,'بَ أب 07'))).then(()=>document.fonts.ready).then(()=>{window.ready=true});
+</script></body></html>

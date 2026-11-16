@@ -58,7 +58,7 @@ const R=window.REEL||{style:'checklist',hook:[{l:'مثال',s:120}],title:[{l:'�
 const POST=new URLSearchParams(location.search).get('fmt')==='post';
 const W=1080,H=POST?1350:1920;document.documentElement.style.width=document.body.style.width=W+'px';document.documentElement.style.height=document.body.style.height=H+'px';
 const ST=R.style;
-const TL={hookIn:-0.45,hookOut:2.75,mainIn:2.8,mainOut:12.9,ctaIn:13.2,phone:14.3,brand:14.9,end:18};
+const QZ=!!R.quiz;const TL=QZ?{hookIn:-0.45,hookOut:2.75,mainIn:2.8,mainOut:16.9,ctaIn:17.2,phone:18.3,brand:18.9,end:22}:{hookIn:-0.45,hookOut:2.75,mainIn:2.8,mainOut:12.9,ctaIn:13.2,phone:14.3,brand:14.9,end:18};
 const L=POST?{tag:40,title:150,visTop:470,visH:680,phone:1190}:{tag:150,title:330,visTop:620,visH:860,phone:1260};
 const clamp=x=>Math.max(0,Math.min(1,x));
 const bez=(x1,y1,x2,y2)=>t=>{if(t<=0)return 0;if(t>=1)return 1;let lo=0,hi=1,u=t;for(let i=0;i<30;i++){u=(lo+hi)/2;const x=3*(1-u)*(1-u)*u*x1+3*(1-u)*u*u*x2+u*u*u;if(x<t)lo=u;else hi=u}return 3*(1-u)*(1-u)*u*y1+3*(1-u)*u*u*y2+u*u*u};
@@ -75,8 +75,8 @@ $('tag').style.top=L.tag+'px';$('phone').style.top=L.phone+'px';$('brand').style
 if(POST){$('phone').style.top=(ST==='documentary'?1160:1190)+'px';$('phone').style.height='130px';$('phone').style.fontSize='70px';$('phone').style.left=$('phone').style.right='190px';$('brand').style.display='none'}
 const V=$('vis');V.style.top=L.visTop+'px';V.style.height=L.visH+'px';
 const items=(R.items||[]).slice(0,5);const n=items.length;
-const itemT=i=>0.7+i*(n>4?1.15:1.35); // seconds after mainIn
-const HERO=itemT(n-1)+0.2;
+const itemT=i=>QZ?0.6+i*0.35:0.7+i*(n>4?1.15:1.35); // seconds after mainIn
+const HERO=QZ?10.9:itemT(n-1)+0.2;
 const icon=k=>({book:'<path d="M8 10h22c6 0 10 4 10 10v40c0-5-4-8-10-8H8z M72 10H50c-6 0-10 4-10 10v40c0-5 4-8 10-8h22z" fill="none" stroke="#F7B731" stroke-width="6" stroke-linejoin="round"/>',
  check:'<path d="M14 42l16 16 34-36" fill="none" stroke="#F7B731" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>',
  screen:'<rect x="8" y="12" width="64" height="42" rx="6" fill="none" stroke="#F7B731" stroke-width="6"/><path d="M30 66h20M40 54v12" stroke="#F7B731" stroke-width="6" stroke-linecap="round"/>',
@@ -109,7 +109,16 @@ split(){const sp=R.split;const rows=sp.rows;const top=POST?0:20;
    rows.map((r,i)=>{const y=top+(POST?100:130)+i*(POST?100:128);return `<div id="row${i}" style="position:absolute;left:0;right:0;top:${y}px;height:${POST?84:104}px"><div style="position:absolute;right:60px;width:440px;height:100%;"><div id="ba${i}" style="position:absolute;right:0;top:${POST?44:62}px;height:${POST?28:34}px;border-radius:17px;background:#5b6378;transform-origin:100% 50%;width:${Math.max(.06,r[1])*440}px"></div><div style="position:absolute;right:0;top:0;font:800 ${POST?32:38}px/1.1 Cairo;color:#cfd3dc">${r[0]}</div></div><div style="position:absolute;left:60px;width:440px;height:100%"><div id="bb${i}" style="position:absolute;left:0;top:${POST?44:62}px;height:${POST?28:34}px;border-radius:17px;background:linear-gradient(90deg,#FFD36B,#F7B731);transform-origin:0 50%;width:${Math.max(.06,r[2])*440}px"></div><div style="position:absolute;left:0;top:0;font:800 ${POST?32:38}px/1.1 Cairo;color:#F5F2EA">${r[0]}</div></div></div>`}).join('')+(sp.note?`<div style="position:absolute;left:0;right:0;bottom:${POST?0:10}px;text-align:center;font:700 34px Tajawal;color:var(--muted)">${sp.note}</div>`:'');
   tick=(u,t)=>{$('dv').style.transform=`scaleY(${P(u,.2,1,eOut)})`;['ha','hb'].forEach((id,k)=>{$(id).style.opacity=P(u,.3+k*.15,.8+k*.15,eOut)});
    rows.forEach((r,i)=>{const a=0.9+i*.55;$('row'+i).style.opacity=P(u,a,a+.3,eOut);$('ba'+i).style.transform=`scaleX(${P(u,a,a+.8,eOver)})`;$('bb'+i).style.transform=`scaleX(${P(u,a+.25,a+1.05,eOver)})`})}},
-spotlight(){$('dots').style.opacity=.08;const pos=items.map((_,i)=>{const cols=n>3?2:1;const col=i%cols,row=Math.floor(i/cols),rows=Math.ceil(n/cols);return [cols==1?540:(col?300:780),(row+.5)*(L.visH/rows)]});
+spotlight(){$('dots').style.opacity=.08;
+  if(QZ){const ans=R.quiz.answer;const ys=items.map((_,i)=>(i+.5)*(L.visH-120)/n+120);
+   V.innerHTML=`<div id="cd" style="position:absolute;left:50%;top:0;width:150px;height:150px;margin-left:-75px;border-radius:50%;border:10px solid #2a3570;box-sizing:border-box;display:flex;align-items:center;justify-content:center;font:900 70px CairoL;z-index:6"><svg style="position:absolute;inset:-10px" width="150" height="150" viewBox="0 0 150 150"><circle id="cdr" cx="75" cy="75" r="65" fill="none" stroke="#F7B731" stroke-width="10" stroke-dasharray="408" stroke-dashoffset="0" transform="rotate(-90 75 75)"/></svg><span id="cdn">10</span></div>`+items.map((it,i)=>`<div class="ck" id="c${i}" style="top:${ys[i]-64}px;height:128px;justify-content:center;font:900 64px Cairo,CairoL;z-index:4"><span dir="auto">${it.t}</span></div>`).join('')+`<div id="dark" style="position:absolute;inset:-40px 0;z-index:3;pointer-events:none"></div>`;
+   tick=(u,t)=>{const cdP=clamp((u-.9)/10);$('cdn').textContent=Math.max(0,Math.ceil(10*(1-cdP)));$('cdr').setAttribute('stroke-dashoffset',408*cdP);$('cd').style.opacity=clamp((u-.3)/.3)*(u>HERO+.4?0.25:1);
+    const rev=u>=HERO;const k=rev?ans:Math.floor(Math.max(0,u-.9)/0.8)%n;const x=540,y=ys[k];const r=rev?lerp(120,1400,P(u,HERO+.6,HERO+1.4,eOut)):110;
+    $('dark').style.background=u<.5?'none':`radial-gradient(ellipse 520px ${r}px at ${x}px ${y}px, rgba(10,16,48,0) 70%, rgba(4,6,18,.82) 100%)`;
+    items.forEach((_,i)=>{const c=$('c'+i),s=spring(u-itemT(i),12,190,.75);const win=rev&&i===ans,lose=rev&&i!==ans;
+     c.style.opacity=clamp((u-itemT(i))/.2)*(lose?.35:1);c.style.transform=`translateX(${(1-s)*200}px) scale(${win?1+.08*spring(u-HERO,9,220,.7):1})`;
+     c.style.background=win?'#F7B731':'var(--card)';c.style.color=win?'#0A1030':'#F5F2EA';c.style.borderColor=win?'#F7B731':'var(--line)'})};
+   return}const longT=items.some(it=>(it.t||'').length>11);const pos=items.map((_,i)=>{const cols=(n>3&&!longT)?2:1;const col=i%cols,row=Math.floor(i/cols),rows=Math.ceil(n/cols);return [cols==1?540:(col?300:780),(row+.5)*(L.visH/rows)]});
   V.innerHTML=items.map((it,i)=>`<div class="sp" id="c${i}" style="left:${pos[i][0]}px;top:${pos[i][1]}px">${it.t}${it.d?`<small>${it.d}</small>`:''}</div>`).join('')+`<div id="dark" style="position:absolute;inset:-40px 0;z-index:3"></div>`;
   window._pos=pos;
   tick=(u,t)=>{let k=0;for(let i=0;i<n;i++)if(u>=itemT(i))k=i;const a=itemT(k),prev=pos[Math.max(0,k-1)],cur=pos[k];const m=P(u,a-.5,a,eIO);let x=lerp(prev[0],cur[0],k?m:1),y=lerp(prev[1],cur[1],k?m:1)+40;const end=P(u,HERO+.3,HERO+1.2,eOut);let r=lerp(150,210,clamp((u-a)/.4))+end*1400;if(u<itemT(0)-.4)r=0;if(POST){r=2000}

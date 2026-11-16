@@ -21,7 +21,7 @@
    "log": "log.csv",
    "meta": "post.json",
    "media": "post.jpg",
-   "posts_per_day": 2,
+   "posts_per_day": 1,
    "url_base": "https://raw.githubusercontent.com/zraij/Athar-media-/main/autopilot/queue"
   },
   "ig": {
@@ -32,6 +32,30 @@
    "media": "reel.mp4",
    "posts_per_day": 1,
    "url_base": "https://zraij.github.io/Athar-media-/autopilot/vqueue"
+  },
+  "igs": {
+   "queue": "squeue",
+   "done": "spublished",
+   "log": "log_igs.csv",
+   "meta": "story.json",
+   "media": "story.jpg",
+   "posts_per_day": 1,
+   "fixed_slots": [
+    "10:00"
+   ],
+   "url_base": "https://zraij.github.io/Athar-media-/autopilot/squeue"
+  },
+  "igc": {
+   "queue": "cqueue",
+   "done": "cpublished",
+   "log": "log_igc.csv",
+   "meta": "carousel.json",
+   "media": "s1.jpg",
+   "posts_per_day": 1,
+   "fixed_slots": [
+    "14:00"
+   ],
+   "url_base": "https://zraij.github.io/Athar-media-/autopilot/cqueue"
   }
  }
 }

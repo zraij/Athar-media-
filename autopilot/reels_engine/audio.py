@@ -58,6 +58,8 @@ G={'whoosh':(whoosh,.35),'pop':(pop,.4),'impact':(impact,.8)}
 for name,ts in cues.items():
     fn,g=G[name]; s=fn()
     for x in ts: add(sfx,x,s,g)
+import os
+if os.environ.get('NO_MUSIC'): mus*=0
 mix=mus*0.55+sfx
 mix/=max(1e-9,np.abs(mix).max()/0.89)
 st=np.stack([mix,mix],1)

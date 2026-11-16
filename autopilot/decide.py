@@ -113,6 +113,7 @@ def plan(args):
     else:
         ranked = sorted(CFG['slots'], key=lambda s: (-su[s][0], -su[s][1], tiebreak(s, today)))
     today_slots = sorted(ranked[:CH['posts_per_day']], key=slot_minutes)
+    if CH.get('fixed_slots'): today_slots = CH['fixed_slots']
     # --- themes (only autopilot posts carry a theme)
     pid2score = {p['post_id']: p for p in scored}
     by_theme = {}
@@ -122,23 +123,34 @@ def plan(args):
     items = []
     for d in sorted(QUEUE.iterdir()) if QUEUE.exists() else []:
         if (d / CH['meta']).exists() and (d / CH['media']).exists():
-            meta = json.loads((d / CH['meta']).read_text(encoding='utf-8')); items.append((d.name, meta['theme']))
-    themes = sorted({t for _, t in items})
+            meta = json.loads((d / CH['meta']).read_text(encoding='utf-8')); items.append((d.name, meta['theme'], meta.get('date')))
+    themes = sorted({t for _, t, _ in items})
     tu = ucb(by_theme, themes, now, CFG['exploration_c'])
     last_theme = log[-1]['theme'] if log else None
     cand = [t for t in themes if t != last_theme] or themes
     theme_rank = sorted(cand, key=lambda t: (-tu[t][0], -tu[t][1], tiebreak(t, today)))
-    nxt = None
-    if theme_rank:
-        t = theme_rank[0]; nid = min(i for i, th in items if th == t); nxt = {'id': nid, 'theme': t}
+    nxt = None; dated = [i for i in items if i[2]]
+    if dated:  # content calendar: only today's item, if there is one
+        todays = [i for i in dated if i[2] == today]
+        if todays: nxt = {'id': todays[0][0], 'theme': todays[0][1]}
+        else:
+            undated = [i for i in items if not i[2]]
+            if undated: nid = min(i[0] for i in undated); nxt = {'id': nid, 'theme': [i[1] for i in undated if i[0] == nid][0]}
+    elif theme_rank:
+        t = theme_rank[0]; nid = min(i for i, th, _ in items if th == t); nxt = {'id': nid, 'theme': t}
+    if nxt:
+        nid = nxt['id']; meta = json.loads((QUEUE / nid / CH['meta']).read_text(encoding='utf-8'))
         nxt['media_url'] = f"{CH['url_base']}/{nid}/{CH['media']}"
         if CH['media'].endswith('.mp4'): nxt['cover_url'] = f"{CH['url_base']}/{nid}/cover.jpg"
-        nxt['caption'] = json.loads((QUEUE / nid / CH['meta']).read_text(encoding='utf-8'))['caption']
+        nxt['caption'] = meta.get('caption', '')
+        if 'slides' in meta: nxt['media_urls'] = [f"{CH['url_base']}/{nid}/s{k}.jpg" for k in range(1, len(meta['slides']) + 1)]
+        if meta.get('date'): nxt['date'] = meta['date']
     # --- should we publish now?
     cur, dist = nearest_slot(local)
     in_window = dist <= CFG['slot_window_minutes']
     ours_today = [r for r in log if parse_time(r['published_at_utc']).astimezone(TZ).date().isoformat() == today]
     recent_any = [p for p in posts if timedelta(0) <= now - p['created'] < timedelta(minutes=CFG['min_gap_from_any_post_minutes'])]
+    if CH.get('fixed_slots'): recent_any = []  # stories and carousels keep their fixed times
     reasons = []
     if not in_window: reasons.append(f'not near any slot (nearest {cur}, {dist} min away)')
     if cur not in today_slots: reasons.append(f'{cur} is not one of today\'s slots {today_slots}')
@@ -184,7 +196,7 @@ def report(args):
     print('\n'.join(lines))
 
 
-ap = argparse.ArgumentParser(); ap.add_argument('--channel', choices=['fb', 'ig'], default='fb'); sp = ap.add_subparsers(dest='cmd', required=True)
+ap = argparse.ArgumentParser(); ap.add_argument('--channel', choices=['fb', 'ig', 'igs', 'igc'], default='fb'); sp = ap.add_subparsers(dest='cmd', required=True)
 a = sp.add_parser('plan'); a.add_argument('--posts'); a.add_argument('--now')
 b = sp.add_parser('record'); b.add_argument('--id', required=True); b.add_argument('--post-id', required=True); b.add_argument('--slot', required=True); b.add_argument('--now')
 c = sp.add_parser('report'); c.add_argument('--posts'); c.add_argument('--days', type=int, default=7)
