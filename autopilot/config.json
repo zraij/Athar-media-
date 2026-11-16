@@ -1,0 +1,13 @@
+{
+  "page_id": "1379414478591224",
+  "page_name": "أثر اكاديمي - Athar Academy",
+  "utc_offset_hours": 3,
+  "slots": ["10:00", "14:00", "17:00", "20:00", "22:00"],
+  "posts_per_day": 2,
+  "slot_window_minutes": 100,
+  "min_gap_from_any_post_minutes": 120,
+  "min_post_age_hours_for_scoring": 20,
+  "exploration_c": 1.0,
+  "queue_low_threshold": 4,
+  "image_url_base": "https://raw.githubusercontent.com/zraij/Athar-media-/main/autopilot/queue"
+}
