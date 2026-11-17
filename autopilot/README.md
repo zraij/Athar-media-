@@ -59,6 +59,7 @@ Runs as two scheduled tasks. Everything a run needs is in this folder.
 
 ## Content calendar
 Facebook goes out **up to 3 posts a day** (`posts_per_day` 3 in `config.json`, the owner's choice): the day's calendar item `queue/<date>/`, then `queue/<date>-b/`, then `-c/` (same `date` field, offered in that order at the day's slots, at least 2h apart). The owner asked never to move or change the original calendar items; extra content always goes on top as `-b` / `-c`.
+17–24 Dec 2026 (`queue/<date>/` = غراس سوفت, theme `ghiras_soft`; `queue/<date>-b/` = شريان, theme `shiryan`) are the owner-approved software posters that follow the books campaign: prebuilt, own captions and sign-offs (not the Athar caption rules); never edit or move them, and add new Athar calendar days after 24 Dec.
 Items with `"prebuilt": true` (posters and carousels designed from real screenshots of the books and ملازم) already have their images: never re-render or overwrite them (the renderers skip them, also with `--all`).
 Every queue (`queue/`, `vqueue/`, `squeue/`, `cqueue/`) holds one folder per date (`YYYY-MM-DD`) with a `date` field: `decide.py` offers today's items first; an item that missed its day **rolls over** and is offered at the next free slot (oldest first, up to 7 days late; `next_item.overdue` is true). The plan is the doc «خطة محتوى أثر أكاديمي — شهر كامل». Old undated items wait in `queue_extra/` and `vextra/` (unused). Music: one brand track (`reels_engine/theme_music.py`) for every reel; HD export 1080x1920, 30 fps, CRF 17.
 
