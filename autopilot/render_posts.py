@@ -13,7 +13,7 @@ Q = pathlib.Path(os.environ.get('Q_DIR', ROOT / 'queue'))
 async def main():
     allf = '--all' in sys.argv
     items = sorted(p for p in Q.iterdir() if (p / 'post.json').exists())
-    todo = [p for p in items if allf or not (p / 'post.jpg').exists()]
+    todo = [p for p in items if (allf or not (p / 'post.jpg').exists()) and not json.loads((p / 'post.json').read_text(encoding='utf-8')).get('prebuilt')]
     async with async_playwright() as pw:
         b = await pw.chromium.launch()
         for d in todo:

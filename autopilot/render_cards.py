@@ -24,6 +24,7 @@ async def main():
             made.append(out)
         for d in sorted((ROOT / 'cqueue').glob('*/carousel.json')):
             c = json.loads(d.read_text(encoding='utf-8'))
+            if c.get('prebuilt'): made += [d.parent / f's{i}.jpg' for i in range(1, len(c['slides']) + 1)]; continue
             for i, s in enumerate(c['slides'], 1):
                 out = d.parent / f's{i}.jpg'
                 if allf or not out.exists(): await shot(b, s, 'post', out)

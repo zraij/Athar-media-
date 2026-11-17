@@ -21,7 +21,7 @@
    "log": "log.csv",
    "meta": "post.json",
    "media": "post.jpg",
-   "posts_per_day": 1,
+   "posts_per_day": 2,
    "url_base": "https://raw.githubusercontent.com/zraij/Athar-media-/main/autopilot/queue"
   },
   "ig": {
