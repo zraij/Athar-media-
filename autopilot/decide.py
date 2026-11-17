@@ -132,7 +132,11 @@ def plan(args):
     nxt = None; dated = [i for i in items if i[2]]
     if dated:  # content calendar: only today's item, if there is one
         todays = [i for i in dated if i[2] == today]
+        # missed days roll over: overdue items (up to 7 days old, oldest first) come after today's items
+        lo = (local.date() - timedelta(days=7)).isoformat()
+        overdue = sorted([i for i in dated if lo <= i[2] < today], key=lambda i: (i[2], i[0]))
         if todays: nxt = {'id': todays[0][0], 'theme': todays[0][1]}
+        elif overdue: nxt = {'id': overdue[0][0], 'theme': overdue[0][1], 'overdue': True}
         else:
             undated = [i for i in items if not i[2]]
             if undated: nid = min(i[0] for i in undated); nxt = {'id': nid, 'theme': [i[1] for i in undated if i[0] == nid][0]}
