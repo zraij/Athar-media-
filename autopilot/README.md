@@ -17,7 +17,7 @@ Runs as two scheduled tasks. Everything a run needs is in this folder.
 - **Score of a post** = impressions + 3×clicks + 5×(reactions+comments) + 2×video views, counted once the post is 20h old. Profile/cover photo changes (no text) are ignored.
 - **Time slots** (Baghdad): 10:00, 14:00, 17:00, 20:00, 22:00. Every page post (also manual reels) is scored against its nearest slot. While some slots are untried: one post goes to the best known slot and the other tries an untried slot. After that: UCB (average log score + exploration bonus) picks the top 2 slots each day.
 - **Topics** (theme of each queued post): same UCB idea over the themes, never the same theme twice in a row.
-- **Safety**: max 3 autopilot posts a day, never twice in one slot, never within 2h of any other page post.
+- **Safety**: max 4 autopilot posts a day, never twice in one slot, never within 2h of any other page post.
 
 ## Run A — publisher (fires at 10:07, 14:07, 17:07, 20:07, 22:07 Baghdad)
 1. Attach the repo with `add_repo` (owner `zraij`, repo `Athar-media-`, access `push`) and clone it to `/home/claude/athar-media-` (`git clone --depth 1 https://github.com/zraij/Athar-media- /home/claude/athar-media-`).
@@ -52,13 +52,13 @@ Runs as two scheduled tasks. Everything a run needs is in this folder.
 1. `python3 autopilot/decide.py --channel igs plan --posts /tmp/ig.json` (fixed slots 10:00, 14:00 and 20:00, up to 3 stories a day: `squeue/<date>/` then `-b` then `-c`; run it in every publisher run, not only at 10:07). Stories marked `prebuilt` already have their `story.jpg`.
 2. If `publish_now`: Windsor `execute_action` connector `instagram`, action `create_story`, params `{"image_url": media_url}` (GitHub Pages, JPEG 1080x1920), then `decide.py --channel igs record --id <id> --post-id <media id> --slot 10:00`, commit, push.
 
-## Run E — Instagram carousel (14:07 run, only on carousel days)
-1. `python3 autopilot/decide.py --channel igc plan --posts /tmp/ig.json` (fixed slot 14:00).
+## Run E — Instagram carousels (14:07 and 20:07 runs)
+1. `python3 autopilot/decide.py --channel igc plan --posts /tmp/ig.json` (fixed slots 14:00 and 20:00, up to 2 carousels a day: `cqueue/<date>/` then `-b`; run it in every publisher run).
 2. If `publish_now`: Windsor `execute_action` connector `instagram`, action `create_carousel_post`, params `{"image_urls": next_item.media_urls, "caption": next_item.caption}`, then `decide.py --channel igc record ...`, commit, push.
    On the same day the Facebook queue item is that carousel's cover (`queue/<date>/post.jpg`), published by Run A.
 
 ## Content calendar
-Facebook now goes out **up to 3 posts a day** (`posts_per_day` 3 in `config.json`): the day's calendar item `queue/<date>/`, then `queue/<date>-b/`, then `queue/<date>-c/` (same `date` field, offered in that order at the day's slots, at least 2h apart). The owner asked never to move or change the original calendar items; extra content always goes on top as `-b` / `-c`.
+Facebook now goes out **up to 4 posts a day** (`posts_per_day` 4 in `config.json`): the day's calendar item `queue/<date>/`, then `queue/<date>-b/`, `-c/`, `-d/` (same `date` field, offered in that order at the day's slots, at least 2h apart). The owner asked never to move or change the original calendar items; extra content always goes on top as `-b` / `-c`.
 Items with `"prebuilt": true` (posters and carousels designed from real screenshots of the books and ملازم) already have their images: never re-render or overwrite them (the renderers skip them, also with `--all`).
 Every queue (`queue/`, `vqueue/`, `squeue/`, `cqueue/`) holds one folder per date (`YYYY-MM-DD`) with a `date` field: `decide.py` offers today's items first; an item that missed its day **rolls over** and is offered at the next free slot (oldest first, up to 7 days late; `next_item.overdue` is true). The plan is the doc «خطة محتوى أثر أكاديمي — شهر كامل». Old undated items wait in `queue_extra/` and `vextra/` (unused). Music: one brand track (`reels_engine/theme_music.py`) for every reel; HD export 1080x1920, 30 fps, CRF 17.
 

@@ -21,7 +21,7 @@
    "log": "log.csv",
    "meta": "post.json",
    "media": "post.jpg",
-   "posts_per_day": 3,
+   "posts_per_day": 4,
    "url_base": "https://raw.githubusercontent.com/zraij/Athar-media-/main/autopilot/queue"
   },
   "ig": {
@@ -53,9 +53,10 @@
    "log": "log_igc.csv",
    "meta": "carousel.json",
    "media": "s1.jpg",
-   "posts_per_day": 1,
+   "posts_per_day": 2,
    "fixed_slots": [
-    "14:00"
+    "14:00",
+    "20:00"
    ],
    "url_base": "https://zraij.github.io/Athar-media-/autopilot/cqueue"
   }
