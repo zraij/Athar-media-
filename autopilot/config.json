@@ -39,9 +39,11 @@
    "log": "log_igs.csv",
    "meta": "story.json",
    "media": "story.jpg",
-   "posts_per_day": 1,
+   "posts_per_day": 3,
    "fixed_slots": [
-    "10:00"
+    "10:00",
+    "14:00",
+    "20:00"
    ],
    "url_base": "https://zraij.github.io/Athar-media-/autopilot/squeue"
   },

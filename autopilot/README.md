@@ -48,8 +48,8 @@ Runs as two scheduled tasks. Everything a run needs is in this folder.
    - Right after the reel (before `record`), share it as the evening story: Windsor `execute_action` connector `instagram`, action `create_story`, params `{"video_url": media_url}`.
 5. At most one reel per run. Only from `vqueue/`.
 
-## Run D — Instagram morning story (10:07 run)
-1. `python3 autopilot/decide.py --channel igs plan --posts /tmp/ig.json` (fixed slot 10:00, today's dated item only).
+## Run D — Instagram stories (every publisher run: 10:07, 14:07 and 20:07 slots)
+1. `python3 autopilot/decide.py --channel igs plan --posts /tmp/ig.json` (fixed slots 10:00, 14:00 and 20:00, up to 3 stories a day: `squeue/<date>/` then `-b` then `-c`; run it in every publisher run, not only at 10:07). Stories marked `prebuilt` already have their `story.jpg`.
 2. If `publish_now`: Windsor `execute_action` connector `instagram`, action `create_story`, params `{"image_url": media_url}` (GitHub Pages, JPEG 1080x1920), then `decide.py --channel igs record --id <id> --post-id <media id> --slot 10:00`, commit, push.
 
 ## Run E — Instagram carousel (14:07 run, only on carousel days)

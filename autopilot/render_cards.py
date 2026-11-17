@@ -20,7 +20,9 @@ async def main():
         b = await p.chromium.launch()
         for d in sorted((ROOT / 'squeue').glob('*/story.json')):
             out = d.parent / 'story.jpg'
-            if allf or not out.exists(): await shot(b, json.loads(d.read_text(encoding='utf-8')), 'story', out)
+            sj = json.loads(d.read_text(encoding='utf-8'))
+            if sj.get('prebuilt'): continue
+            if allf or not out.exists(): await shot(b, sj, 'story', out)
             made.append(out)
         for d in sorted((ROOT / 'cqueue').glob('*/carousel.json')):
             c = json.loads(d.read_text(encoding='utf-8'))
