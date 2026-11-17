@@ -39,7 +39,7 @@ Runs as two scheduled tasks. Everything a run needs is in this folder.
 2. Windsor `get_data` on `instagram` (accounts `["<instagram id>"]`, date_preset `last_30dT`) with fields
    `media_id, timestamp, media_caption, media_type, media_reach, media_views, media_like_count, media_comments_count, media_shares, media_saved`. Save the response to `/tmp/ig.json` (an empty `data` list is fine for a new account).
    Weekly run only: also read `followers_count` and the audience fields `audience_gender_age_name, audience_gender_age_size, city, audience_city_size` for the report (they stay empty until the account has enough followers). `decide.py` understands both Facebook and Instagram field names.
-3. `python3 autopilot/decide.py --channel ig plan --posts /tmp/ig.json` (1 reel a day; slots learned from Instagram data only).
+3. `python3 autopilot/decide.py --channel ig plan --posts /tmp/ig.json` (up to 2 reels a day: `vqueue/<date>/` then `vqueue/<date>-b/`; slots learned from Instagram data only).
 4. If `publish_now`:
    - The video is served by GitHub Pages. Do not curl zraij.github.io (the sandbox proxy blocks it). Instead check the API: `curl -s https://api.github.com/repos/zraij/Athar-media-` must show `"has_pages": true`, and the newest deployment in `https://api.github.com/repos/zraij/Athar-media-/deployments?per_page=1` must have a `success` status (its `statuses_url`). If Pages is off, stop and say in Arabic that Pages must be enabled (Settings → Pages → Branch main).
    - Windsor `execute_action`: connector `instagram`, action `create_video_post`, account <instagram id>, params `{"video_url": media_url, "caption": caption, "cover_url": cover_url, "share_to_feed": true}`.
