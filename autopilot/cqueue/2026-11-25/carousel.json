@@ -1,0 +1,32 @@
+{
+ "theme": "interactive_books",
+ "prebuilt": true,
+ "date": "2026-11-25",
+ "caption": "6 طرق تشوف بيها كتب أثر أكاديمي 👈 اسحب\nتذكرة للوزاري، جدول دوري، قبل وبعد، جريدة، إشعارات، ومستويات. أي وحدة عجبتك أكثر؟\n\n📍 لكل محافظات العراق، نتواصل وياك أونلاين\n🔁 شاركه ويا زميلك المدرس\n\n📞 للحجز والاستفسار: 07746451098\nأثر أكاديمي.. محتوى تعليمي يترك أثر\n\n#أثر_أكاديمي #كتب_تفاعلية #سبورة_ذكية #مدرسين_العراق #تعليم_العراق #العراق",
+ "slides": [
+  {
+   "kind": "prebuilt",
+   "src": "x1_ticket"
+  },
+  {
+   "kind": "prebuilt",
+   "src": "x2_elements"
+  },
+  {
+   "kind": "prebuilt",
+   "src": "x4_before_after"
+  },
+  {
+   "kind": "prebuilt",
+   "src": "x5_news"
+  },
+  {
+   "kind": "prebuilt",
+   "src": "x6_notifications"
+  },
+  {
+   "kind": "prebuilt",
+   "src": "x7_levelup"
+  }
+ ]
+}
