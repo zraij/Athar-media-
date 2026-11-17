@@ -76,6 +76,7 @@ Every queue (`queue/`, `vqueue/`, `squeue/`, `cqueue/`) holds one folder per dat
   schools, per school year: الأساسية 250,000 (ملزمة باسم المدرسة لمادة ومرحلة) · المتقدمة 900,000, recommended (ملازم السادس العلمي الأربعة باسم المدرسة + 4 كتب تفاعلية) · الشاملة 1,750,000 (كل الكتب التفاعلية + كل الملازم + جلسة تدريب) · الابتدائي 400,000 («قراءتي الجديدة» + علوم الأول);
   teachers: «ملزمتك باسمك» 125,000 instead of 150,000 for the first 10 teachers before mid-year · كتاب تفاعلي لمادة 50,000 (سنة، حساب واحد) · ملزمة + كتاب 175,000 · ملزمة من محتوى المدرس 2,500 للصفحة;
   postgrad: سمنار 35,000 (لحد 15 شريحة + PDF + تعديل مجاني) · عرض مناقشة 75,000 (لحد 30 شريحة); free 10-minute demo on the school's board. No paid ads for now (organic only).
+- Lead magnet: free PDF «ملخصات أثر أكاديمي» for السادس العلمي at https://zraij.github.io/Athar-media-/free/athar-summaries-6sci.pdf . Posts may say «اكتب «ملخص» بالخاص ويوصلك» (the chat assistant sends the link).
 - Facts you may use (nothing else; never invent prices, results, clients or numbers):
   interactive books for smart boards (Android): السادس العلمي كيمياء/فيزياء/أحياء/رياضيات، الإنكليزي للسادس الإعدادي، «قراءتي الجديدة» كتاب ناطق والعلوم للأول الابتدائي؛
   ملازم مطبوعة باسم المدرسة/المدرّس وشعارها (all stages and subjects, Iraqi curriculum)؛ offers for private (أهلية) schools؛
